@@ -1,0 +1,5 @@
+_site
+.sass-cache
+.asset-cache
+.sprockets-manifest-*.json
+.jekyll-metadata

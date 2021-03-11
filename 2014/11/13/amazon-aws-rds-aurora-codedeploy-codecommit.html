@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="AWS 새로운 서비스들: Aurora 등" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="AWS re:Invent 2014 에서 발표한 Amazon 의 새로운 서비스들 Aurora MySQL과 호환가능한 AWS 환경에 최적화된 RDBMS. RDS에서 DB엔진을 선택하는 메뉴에서 선택 가능. RDS의 MySQL 인스턴스에 비해 최대 5배 빠름. MySQL 5.6과 호환...."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="AWS 새로운 서비스들: Aurora 등"/>
+  <meta name="og:description"  content="AWS re:Invent 2014 에서 발표한 Amazon 의 새로운 서비스들 Aurora MySQL과 호환가능한 AWS 환경에 최적화된 RDBMS. RDS에서 DB엔진을 선택하는 메뉴에서 선택 가능. RDS의 MySQL 인스턴스에 비해 최대 5배 빠름. MySQL 5.6과 호환...."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/11/13/amazon-aws-rds-aurora-codedeploy-codecommit.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="AWS 새로운 서비스들: Aurora 등"/>
+  <meta name="twitter:description" content="AWS re:Invent 2014 에서 발표한 Amazon 의 새로운 서비스들 Aurora MySQL과 호환가능한 AWS 환경에 최적화된 RDBMS. RDS에서 DB엔진을 선택하는 메뉴에서 선택 가능. RDS의 MySQL 인스턴스에 비해 최대 5배 빠름. MySQL 5.6과 호환...."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>AWS 새로운 서비스들: Aurora 등</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">AWS 새로운 서비스들: Aurora 등</h1>
+    <p class="post-meta"><time datetime="2014-11-13T11:31:00+09:00" itemprop="datePublished">2014-11-13</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>AWS re:Invent 2014 에서 발표한 Amazon 의 새로운 서비스들</p>
+
+<h3 id="aurora"><a href="http://aws.amazon.com/ko/rds/aurora/">Aurora</a></h3>
+
+<ul>
+  <li>MySQL과 호환가능한 AWS 환경에 최적화된 RDBMS.</li>
+  <li>RDS에서 DB엔진을 선택하는 메뉴에서 선택 가능.</li>
+  <li>RDS의 MySQL 인스턴스에 비해 최대 5배 빠름.</li>
+  <li>MySQL 5.6과 호환.</li>
+  <li>1분 동안 INSERT 최대 6,000,000회 SELECT 최대 30,000,000회 실행.</li>
+  <li>고가용성. 데이터가 6중화 되어있음. S3와 동일한 99.99% 가용성. (3개의 AZ에 복제. 각 AZ 안에서 2개로 복제)</li>
+  <li>데이터 양에 따라 스토리지를 10GB 에서 64TB 까지 자동확장.</li>
+  <li>기존 MySQL RDS 보다 성능은 좋고, 더 싸다고 함.</li>
+  <li>캐시가 DB 밖에 있는 듯.
+    <ul>
+      <li>즉, 재시작 해도 캐시는 유지되는 구조?</li>
+    </ul>
+  </li>
+  <li>multi-master 필요 없다. master DB를 엄청나게 scale-up 이 가능한 구조로 만드는 듯.</li>
+</ul>
+
+<h3 id="key-management-service-kms"><a href="https://aws.amazon.com/ko/kms/">Key Management Service (KMS)</a></h3>
+
+<ul>
+  <li>서버측 암호화를 위한 마스터 키 관리 서비스.</li>
+  <li>엔터프라이즈 급의 키관리에서 발생하는 확장성 및 가용성 문제를 우리가 해결해줄게.</li>
+  <li>클라우드에 고객의 개인정보를 담는 것에 대한 걱정도 (어느정도) 해결해줄게.</li>
+  <li>키관리 API, 암호화 API 제공.</li>
+</ul>
+
+<h3 id="codedeploy"><a href="http://aws.amazon.com/ko/codedeploy/">CodeDeploy</a></h3>
+
+<ul>
+  <li>서비스 다운타임없이 코드를 EC2 에 배포하고, 롤백하고, 관리하는 서비스.</li>
+  <li>무료.</li>
+  <li>원래 AWS 시스템 자체의 내부 배포/CI 도구가 Apllo라는 이름으로 존재하고.
+    <ul>
+      <li>최근 12개월 동안 5천만번 이상의 배포가 있었다고 한다.</li>
+      <li>이것을 서비스화 한 것.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="codecommit"><a href="https://aws.amazon.com/ko/codecommit/">CodeCommit</a></h3>
+
+<ul>
+  <li>git 저장소 서비스.</li>
+  <li>고가용성.</li>
+  <li>저장소 크기 제한 없음.</li>
+  <li>2015년 초에 오픈. 가격 미정.</li>
+</ul>
+
+<h3 id="codepipeline"><a href="http://aws.amazon.com/ko/codepipeline/">CodePipeline</a></h3>
+
+<ul>
+  <li>릴리즈 과정을 자동화하는 서비스.</li>
+</ul>
+
+<h3 id="lambda"><a href="http://aws.amazon.com/ko/lambda/">Lambda</a></h3>
+
+<ul>
+  <li>클라우드에서 매크로를 실행.</li>
+  <li>AWS 서비스로부터 이벤트를 받아서, 람다함수를 실행한다.</li>
+  <li>e.g.
+    <ul>
+      <li>모바일에서 이미지를 S3에 저장하면, 해당 이벤트를 받아서, DynamoDB 에 이미지의 위치정보를 저장하는 기능을 만들 수 있다.</li>
+      <li>(이번에 S3의 이벤트 알림이 추가되었다!)</li>
+    </ul>
+  </li>
+  <li>AWS 이벤트 외에 커스텀 이벤트도 가능하다.</li>
+  <li>1백만 개의 요청과 320만초의 실행시간을 무료로 제공.</li>
+</ul>
+
+<h3 id="docker를-지원하는-amazon-ec2-container-service-ecs"><a href="http://aws.amazon.com/ko/ecs/">Docker를 지원하는 Amazon EC2 Container Service (ECS)</a></h3>
+
+<ul>
+  <li>높은 확장성, 높은 성능의 컨테이너 관리 서비스.</li>
+  <li>컨테이너 버전관리, 배포, 롤백 기능 제공.</li>
+</ul>
+
+<h3 id="참고자료">참고자료</h3>
+
+<ul>
+  <li><a href="http://aws.amazon.com/ko/blogs/aws/highly-scalable-mysql-compat-rds-db-engine/">Amazon Aurora - New Cost-Effective MySQL-Compatible Database Engine for Amazon RDS</a></li>
+  <li><a href="http://aws.amazon.com/ko/blogs/aws/code-management-and-deployment/">New AWS Tools for Code Management and Deployment</a></li>
+  <li><a href="http://sdtimes.com/amazon-announces-new-code-tools-aurora-mysql-database-engine-aws-reinvent/">Amazon announces new code tools, Aurora MySQL database engine at AWS re:Invent - SD Times</a></li>
+  <li><a href="http://aws.amazon.com/ko/blogs/aws/new-key-management-service/">New AWS Key Management Service (KMS)</a></li>
+  <li><a href="https://reinvent.awsevents.com/">AWS re:Invent 2014</a></li>
+  <li><a href="https://news.ycombinator.com/item?id=8596900">오로라에 대한 해커뉴스 토론</a></li>
+  <li>AWS사용량 등을 알 수 있는, 아주 재밌게 본 슬라이드:</li>
+</ul>
+<iframe src="//www.slideshare.net/slideshow/embed_code/41572733" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen=""> </iframe>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

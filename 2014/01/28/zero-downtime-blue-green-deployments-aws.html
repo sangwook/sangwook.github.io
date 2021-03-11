@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="AWS 에서 Blue-Green 무중단 배포 구현" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="1개의 EC2 인스턴스 (Elastic IP) Elastic IP 는 blue-green 스위치의 가장 단순한 방법이다. 방법은: 새로운 EC2 인스턴스를 런칭한다. 설정하고 새로운 버전을 배포하고 테스트하고 운영서버에 적용할 준비가 되면 단순히 EIP 를 새로운 인스턴스로 할당하..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="AWS 에서 Blue-Green 무중단 배포 구현"/>
+  <meta name="og:description"  content="1개의 EC2 인스턴스 (Elastic IP) Elastic IP 는 blue-green 스위치의 가장 단순한 방법이다. 방법은: 새로운 EC2 인스턴스를 런칭한다. 설정하고 새로운 버전을 배포하고 테스트하고 운영서버에 적용할 준비가 되면 단순히 EIP 를 새로운 인스턴스로 할당하..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/01/28/zero-downtime-blue-green-deployments-aws.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="AWS 에서 Blue-Green 무중단 배포 구현"/>
+  <meta name="twitter:description" content="1개의 EC2 인스턴스 (Elastic IP) Elastic IP 는 blue-green 스위치의 가장 단순한 방법이다. 방법은: 새로운 EC2 인스턴스를 런칭한다. 설정하고 새로운 버전을 배포하고 테스트하고 운영서버에 적용할 준비가 되면 단순히 EIP 를 새로운 인스턴스로 할당하..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>AWS 에서 Blue-Green 무중단 배포 구현</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">AWS 에서 Blue-Green 무중단 배포 구현</h1>
+    <p class="post-meta"><time datetime="2014-01-28T15:04:00+09:00" itemprop="datePublished">2014-01-28</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>1개의 EC2 인스턴스 (Elastic IP)</p>
+
+<ul>
+  <li>Elastic IP 는 blue-green 스위치의 가장 단순한 방법이다.</li>
+  <li>방법은:
+    <ul>
+      <li>새로운 EC2 인스턴스를 런칭한다.</li>
+      <li>설정하고</li>
+      <li>새로운 버전을 배포하고</li>
+      <li>테스트하고</li>
+      <li>운영서버에 적용할 준비가 되면</li>
+    </ul>
+  </li>
+  <li>단순히 EIP 를 새로운 인스턴스로 할당하면 된다.</li>
+  <li>그러면 사용자의 트래픽은 (거의) 즉시 새로운 인스턴스로 redirect 된다.</li>
+</ul>
+
+<p>ELB 뒤에서 여러 EC2 인스턴스가 있는 경우</p>
+
+<ul>
+  <li>LB로 배포하는 것이면 위와같은 EIP를 이용한 테크닉은 동작하지 않는다.
+    <ul>
+      <li>왜냐하면 EIP와 ELB는 associate 될 수 없기때문에.</li>
+    </ul>
+  </li>
+  <li>이 경우, blue 환경은 EC2 인스턴스 pool 중 하나이고
+    <ul>
+      <li>LB는 request 를 pool 중에 healthy 상태인 인스턴스 중 하나로 임의로 보낼 것이다.</li>
+      <li>blue-green 스위치가 같은 LB 뒤에서 동작하려면 pool 에 있는 모든 EC2 인스턴스를 새로운 version 으로 교체해야 한다.</li>
+    </ul>
+  </li>
+  <li>이 방법은 2가지가 있다.
+    <ul>
+      <li>automating a series of API calls</li>
+      <li>using AutoScaling groups.</li>
+    </ul>
+  </li>
+  <li>automating a series of API calls
+    <ul>
+      <li>ELB API: <a href="http://docs.aws.amazon.com/ElasticLoadBalancing/latest/APIReference/Welcome.html">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/APIReference/Welcome.html</a></li>
+      <li>EC2 인스턴스를 등록/삭제를 이 API로 할 수 있다.</li>
+      <li>API콜로 “blue” 인스턴스들을 제거하면서 “green” 인스턴스를 등록해야 한다.</li>
+      <li>이 작업을 병렬로 매우 빨리 수행할 수 있다.</li>
+      <li>하지만, 스위치는 즉시 이루어지지 않을 거다. 왜냐하면 ELB에 인스턴스를 등록하는 것과 request 를 생성한 인스턴스로 route 하도록 ELB를 시작하는 것 사이에 딜레이가 있기 때문이다.</li>
+      <li>이것은 ELB가 오직 healthy 인스턴스로만 route 하기 때문이다. 그래서 health check 를 위한 약간의 시간이 필요하다.</li>
+    </ul>
+  </li>
+  <li>using AutoScaling groups.
+    <ul>
+      <li>EC2 인스턴스를 늘리고, 줄이는 것을 자동화하는 AutoScaling 을 사용하는 방법.
+        <ul>
+          <li>AutoScaling은 만약 인스턴스가 unhealthy 상태가 되거나 지정한 threshold 를 넘어가면 인스턴스를 추가하고 교체한다.</li>
+        </ul>
+      </li>
+      <li>이런 특징들을 이용해서 blue/green 스위치를 구현하면:
+        <ul>
+          <li>새로운 “green” 버전을 위한 launch configuration 을 생성한다.</li>
+          <li>생성한 launch configuration 을 사용한 새로운 “green” AutoScaling group 을 생성한다.
+            <ul>
+              <li>그리고 서빙중인 “blue” 인스턴스들과 같은 ELB로 associate 한다.</li>
+              <li>새로운 인스턴스가 healthy 상태가 되서 등록되도록 기다린다.</li>
+            </ul>
+          </li>
+          <li>“blue” 그룹의 원하는 인스턴스 개수(desired number of instances)를 0으로 업데이트 하고, 예전 인스턴스들이 죽을때까지 기다린다.</li>
+          <li>“blue” AutoScaling group 과 launch configuration 을 삭제한다.</li>
+        </ul>
+      </li>
+      <li>이 방법의 단점은 느리다는 것이다.
+        <ul>
+          <li>새로운 인스턴스가 생성될때까지 기다리고,</li>
+          <li>AutoScaling group 이 healthy 상태를 확인할 때까지 기다리고,</li>
+          <li>ELB 가 healthy 상태를 확인할 때까지 기다리고</li>
+          <li>예전 인스턴스들이 죽을때까지 기다린다.</li>
+        </ul>
+      </li>
+      <li>이런 이유때문에 난 이 방법을 쓰지 않고 다음에 나오는 DNS redirection 을 사용한다. (읽고나니 이걸 안 쓴다고… ;;;)</li>
+    </ul>
+  </li>
+</ul>
+
+<p>DNS redirection using Route53</p>
+
+<ul>
+  <li>당신은 EIP주소나 긴 ELB 호스트 네임 대신에 domain 주소를 가지고 있을 것이다.
+    <ul>
+      <li>AWS 이외의 상황이라면 아마 blue-green 스위치는 DNS의 CNAME 레코드를 변경하는 것으로 수행했을 거다.</li>
+      <li>AWS에서는 같은 결과를 얻는데 Route53 를 사용할 수 있다.</li>
+      <li>Route53로 심플하게 새로운 ELB를 바라보도록 resource record set 을 업데이트 하면 된다.</li>
+    </ul>
+  </li>
+  <li>Route53 가 이러한 일반적인 DNS 접근을 지원하고 있지만, 좀더 좋은 대안이 있다.</li>
+  <li>대안: Route53 을 Weighted 라운드로빈으로 사용하는 방법.
+    <ul>
+      <li>이것은 regular resource record sets, alias resource record sets 둘다 작동한다.</li>
+      <li>방법은. 같은 도메인/서브도메인의 multiple answers 로 associate 하도록 설정한다.
+        <ul>
+          <li>그리고 각 엔트리 별로 0-255 사이의 가중치를 부여한다.</li>
+        </ul>
+      </li>
+      <li>DNS 쿼리가 처리될때, Route53 은 가중치를 기반으로 계산된 확률을 사용해서 하나의 answer 를 선택할 것이다.</li>
+      <li>blue-green 스위치가 작동하기 위해서는
+        <ul>
+          <li>현재의 “blue” 환경의 엔트리 가중치는 255 가 되어야 하고</li>
+          <li>새로운 “green” 환경은 가중치 0이 되어야 한다.</li>
+          <li>그러면 단순하게 가중치에 의해서 트래픽이 blue 에서 green 으로 swap 된다.</li>
+        </ul>
+      </li>
+      <li>이 방법의 유일한 단점은 DNS 변경 전파에 약간의 시간이 걸린다는 것이다.
+        <ul>
+          <li>그래서 넌 사용자가 perceive 할 시기를 컨트롤 할 수 없다.</li>
+        </ul>
+      </li>
+      <li>장점은 거의 zero-downtime 이라는 것이다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Environment swap with Elastic Beanstalk</p>
+
+<ul>
+  <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.CNAMESwap.html">http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.CNAMESwap.html</a>
+    <ul>
+      <li>여기 있는 설명대로 CNAMEs swap 을 하면 된다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><a href="http://www.thoughtworks.com/insights/blog/implementing-blue-green-deployments-aws">http://www.thoughtworks.com/insights/blog/implementing-blue-green-deployments-aws</a></p>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

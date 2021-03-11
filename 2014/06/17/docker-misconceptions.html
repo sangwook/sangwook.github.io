@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="#Docker 에 대한 오해" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="“Docker 1.0 발표에 대한 Hacker News 토론” 에서 “Docker Misconceptions” 라는 포스팅을 보고. 오해: Docker를 배우면, 다른 시스템 관련된 것들은 더이상 안 배워도 된다? 아니다. 운영환경에서 사용하려면, 아래와 같은 것들을 매우 깊게 관..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="#Docker 에 대한 오해"/>
+  <meta name="og:description"  content="“Docker 1.0 발표에 대한 Hacker News 토론” 에서 “Docker Misconceptions” 라는 포스팅을 보고. 오해: Docker를 배우면, 다른 시스템 관련된 것들은 더이상 안 배워도 된다? 아니다. 운영환경에서 사용하려면, 아래와 같은 것들을 매우 깊게 관..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/06/17/docker-misconceptions.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="#Docker 에 대한 오해"/>
+  <meta name="twitter:description" content="“Docker 1.0 발표에 대한 Hacker News 토론” 에서 “Docker Misconceptions” 라는 포스팅을 보고. 오해: Docker를 배우면, 다른 시스템 관련된 것들은 더이상 안 배워도 된다? 아니다. 운영환경에서 사용하려면, 아래와 같은 것들을 매우 깊게 관..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>#Docker 에 대한 오해</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">#Docker 에 대한 오해</h1>
+    <p class="post-meta"><time datetime="2014-06-17T13:55:00+09:00" itemprop="datePublished">2014-06-17</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="https://news.ycombinator.com/item?id=7868791">“Docker 1.0 발표에 대한 Hacker News 토론”</a> 에서 <a href="https://devopsu.com/blog/docker-misconceptions/">“Docker Misconceptions”</a> 라는 포스팅을 보고.</p>
+
+<h3 id="오해-docker를-배우면-다른-시스템-관련된-것들은-더이상-안-배워도-된다">오해: Docker를 배우면, 다른 시스템 관련된 것들은 더이상 안 배워도 된다?</h3>
+
+<ul>
+  <li>아니다. 운영환경에서 사용하려면, 아래와 같은 것들을 매우 깊게 관리하는 것이 필요하다.
+    <ul>
+      <li>secured private image repository (index)</li>
+      <li>orchestrating container deploys with zero downtime</li>
+      <li>orchestrating container deploy roll-backs</li>
+      <li>networking between containers on multiple hosts</li>
+      <li>managing container logs</li>
+      <li>managing container data (db, etc)</li>
+      <li>creating images that properly handle init, logs, etc</li>
+      <li>much much more…</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="오해-docker-컨테이너-1개-당-1개의-프로세스만-가져야-한다">오해: Docker 컨테이너 1개 당 1개의 프로세스만 가져야 한다?</h3>
+
+<ul>
+  <li>아니다. 단일 프로세스가 아니라 “역할 기반 가상 머신”의 방향으로 Docker 를 관리하는 것이 좋다.</li>
+  <li>나쁜 예: ssh, cron, app, web server 를 컨테이너로 나누는 것.</li>
+  <li>좋은 예: app, db, redis 를 컨테이너로 나누는 것.</li>
+  <li>이것은 이론적으로 논쟁이 있다.
+    <ul>
+      <li>만약 이 주장에 동의하지 않는다면 <a href="http://highscalability.com/blog/2014/4/8/microservices-not-a-free-lunch.html">“Microservices - Not a free lunch! - High Scalability”</a> 이것을 읽어 봐라.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="오해-docker를-사용하면-configuration-management-cm-tool이-필요없다">오해: Docker를 사용하면, configuration management (CM) tool이 필요없다?</h3>
+
+<ul>
+  <li>부분적으로 사실이다.</li>
+  <li>Docker를 사용하면 설정관리의 필요성은 낮아진다.
+    <ul>
+      <li>하지만 provision, deploy, manage your servers 를 위한 orchestration tool이 절대적으로 필요하다.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Ansible</code> 같은 툴이 이런 곳에 사용하기 좋다.</li>
+  <li>(Ansible 이 짱이라는 내용이 뒤에 이어짐. 생략)</li>
+</ul>
+
+<h3 id="오해-docker를-당장-사용해야만-하겠군">오해: Docker를 당장 사용해야만 하겠군!</h3>
+
+<p>지금 당장 운영환경에 Docker를 도입하려면, 당신의 운영환경이 아래의 것들을 만족해야 한다.</p>
+
+<ul>
+  <li>secured least-privilege access (key based logins, firewalls, fail2ban, etc)</li>
+  <li>restorable secure off-site database backups</li>
+  <li>automated system setup (using Ansible, Puppet, etc)</li>
+  <li>automated deploys</li>
+  <li>automated provisioning</li>
+  <li>monitoring of all critical services</li>
+  <li>and more (documentation, etc)</li>
+</ul>
+
+<p>만약 인프라의 심각한 구멍(critical holes in your infrastructure)을 가지고 있는 채 Docker를 사용하려고 하는 것은. 불안정한 절벽 끝에 페라리를 주차해 놓은 것과 같다.</p>
+
+<h3 id="오해-속도와-일관성을-위해-docker를-사용해야만-하겠군">오해: 속도와 일관성을 위해 Docker를 사용해야만 하겠군!</h3>
+
+<p>여기에 Docker를 사용하지 않고, 속도와 일관성을 유지하는 방법들이 나옴.</p>
+
+<ul>
+  <li>설정관리 도구인 Ansible, Puppet 사용하기.</li>
+  <li>클라우드 이미지 사용하기.</li>
+  <li>Version Pinning (버전 명시하기)
+    <ul>
+      <li>e.g. 설정관리 도구에서 nginx가 아니라 ‘nginx version 1.4.6-1ubuntu3’ 로 명시해서 설치.</li>
+    </ul>
+  </li>
+  <li>배포 버전 관리</li>
+  <li>배포 패키징</li>
+</ul>
+
+<h3 id="그럼-언제-docker를-사용해야-하지">그럼 언제 Docker를 사용해야 하지?</h3>
+
+<ul>
+  <li>개발환경에서 Vagrant를 쓰고 있다면, 당장 docker로 전환할 수 있다.
+    <ul>
+      <li>(상욱: 나도 얼마전에 대부분 docker로 옮겼는데 빠르고, 관리하기 좋다)</li>
+    </ul>
+  </li>
+  <li>운영환경에서는 가능하면 Docker를 사용하지 않는, 위에서 언급한 최적화 방법들을 추천한다.</li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

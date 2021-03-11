@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="텀블러의 검색 아키텍처" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="검색쿼리 50M/하루 Solr, Redis, MySQL 인덱스 모든 블로그 포스트는 600+ 대의 머신에 최근 6주 + 최근 4년간 인기글 + 태그 테이블 40대의 머신에서 처리 랭킹 추천에 대한 A/B 테스트는 follow 비율로 판단함. 처음엔 Elasticsearch 로 시작..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="텀블러의 검색 아키텍처"/>
+  <meta name="og:description"  content="검색쿼리 50M/하루 Solr, Redis, MySQL 인덱스 모든 블로그 포스트는 600+ 대의 머신에 최근 6주 + 최근 4년간 인기글 + 태그 테이블 40대의 머신에서 처리 랭킹 추천에 대한 A/B 테스트는 follow 비율로 판단함. 처음엔 Elasticsearch 로 시작..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/02/13/search-at-tumblr-by-yufei-pan.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="텀블러의 검색 아키텍처"/>
+  <meta name="twitter:description" content="검색쿼리 50M/하루 Solr, Redis, MySQL 인덱스 모든 블로그 포스트는 600+ 대의 머신에 최근 6주 + 최근 4년간 인기글 + 태그 테이블 40대의 머신에서 처리 랭킹 추천에 대한 A/B 테스트는 follow 비율로 판단함. 처음엔 Elasticsearch 로 시작..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>텀블러의 검색 아키텍처</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">텀블러의 검색 아키텍처</h1>
+    <p class="post-meta"><time datetime="2014-02-13T16:23:00+09:00" itemprop="datePublished">2014-02-13</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li>검색쿼리 50M/하루</li>
+  <li>Solr, Redis, MySQL</li>
+  <li>인덱스
+    <ul>
+      <li>모든 블로그 포스트는 600+ 대의 머신에</li>
+      <li>최근 6주 + 최근 4년간 인기글 + 태그 테이블
+        <ul>
+          <li>40대의 머신에서 처리</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>랭킹
+    <ul>
+      <li>추천에 대한 A/B 테스트는 follow 비율로 판단함.</li>
+    </ul>
+  </li>
+  <li>처음엔 Elasticsearch 로 시작했다.
+    <ul>
+      <li>Elasticsearch는 클러스터 생성이 블랙박스였다.</li>
+      <li>reliability를 위해 SolrCloud 로 바꿨다.</li>
+      <li>SolrCloud 는 복제가 샤드의 모든 인덱스를 지연시키는 문제가 있어서.</li>
+      <li>결국 Solr + 커스텀 클러스터링으로 구성했다.</li>
+    </ul>
+  </li>
+</ul>
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/d1JG0LjdDqQ" frameborder="0" allowfullscreen=""></iframe>
+
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/eDs2ETzUScnvxa" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen=""> </iframe>
+
+<p><a href="https://www.slideshare.net/otisg/search-at-tumblr-nyc-search-meetup">https://www.slideshare.net/otisg/search-at-tumblr-nyc-search-meetup</a></p>
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

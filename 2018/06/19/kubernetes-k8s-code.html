@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="쿠버네티스 코드 읽기" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="요즘은 kubernetes(이하 k8s) 소스 코드를 읽고 있다. 디자인이 단순하기 때문에 비교적 읽기 어렵지 않다. 그래서 이렇게 인기를 얻는 것이겠지. 디자인이 단순해진 것은 etcd의 기능 덕분이라고 생각한다. k8s는 etcd를 task-queue처럼 사용한다. mesos는..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="쿠버네티스 코드 읽기"/>
+  <meta name="og:description"  content="요즘은 kubernetes(이하 k8s) 소스 코드를 읽고 있다. 디자인이 단순하기 때문에 비교적 읽기 어렵지 않다. 그래서 이렇게 인기를 얻는 것이겠지. 디자인이 단순해진 것은 etcd의 기능 덕분이라고 생각한다. k8s는 etcd를 task-queue처럼 사용한다. mesos는..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2018/06/19/kubernetes-k8s-code.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="쿠버네티스 코드 읽기"/>
+  <meta name="twitter:description" content="요즘은 kubernetes(이하 k8s) 소스 코드를 읽고 있다. 디자인이 단순하기 때문에 비교적 읽기 어렵지 않다. 그래서 이렇게 인기를 얻는 것이겠지. 디자인이 단순해진 것은 etcd의 기능 덕분이라고 생각한다. k8s는 etcd를 task-queue처럼 사용한다. mesos는..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>쿠버네티스 코드 읽기</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">쿠버네티스 코드 읽기</h1>
+    <p class="post-meta"><time datetime="2018-06-19T22:26:00+09:00" itemprop="datePublished">2018-06-19</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li>요즘은 kubernetes(이하 k8s) 소스 코드를 읽고 있다.</li>
+  <li>디자인이 단순하기 때문에 비교적 읽기 어렵지 않다.</li>
+  <li>그래서 이렇게 인기를 얻는 것이겠지.</li>
+  <li>디자인이 단순해진 것은 etcd의 기능 덕분이라고 생각한다.
+    <ul>
+      <li>k8s는 etcd를 task-queue처럼 사용한다.</li>
+      <li>mesos는 zookeeper를 사용하는데, 이 선택이 큰 차이를 만드는게 아닐까.</li>
+    </ul>
+  </li>
+  <li>오래전에 분석할땐 “미니언”이라는 용어를 사용하더니 “노드”로 변경했다.
+    <ul>
+      <li>“노드”로 선택한 덕분에 미니언이 뭐하는 것인지 추가 설명이 필요없다.</li>
+      <li>변경한 시점에 나온 이름 후보들을 보니(Koupi, Rower, Krew)
+        <ul>
+          <li><a href="https://github.com/kubernetes/kubernetes/issues/1111">https://github.com/kubernetes/kubernetes/issues/1111</a></li>
+        </ul>
+      </li>
+      <li>“항해”에 비유하고 싶은 욕망이 강했나 보다.</li>
+      <li>하지만 비유나 추상화 보단, 구체적인 용어가 좋다.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="쿠버네티스를-소스에서-빌드">쿠버네티스를 소스에서 빌드</h2>
+
+<ul>
+  <li>나는 내가 쓰는 솔루션은 직접 빌드해서 쓰는걸 좋아한다.
+    <ul>
+      <li>(물론 내 개발용도에만)</li>
+    </ul>
+  </li>
+  <li>예를 들면, mysql을 많이 쓰니 (코드 수정을 해서) 직접 빌드해서 쓰는 식이다.</li>
+  <li>그리고 문서를 읽기 보다는</li>
+  <li>코드를 읽고, 로그를 찍고, 돌려본다.</li>
+  <li>그러면 아주 많은 장점이 있는데, 아마 해본 사람만 느끼리라.
+    <ul>
+      <li>리눅스 데스크탑을 운영체제로 쓰는 장점,</li>
+      <li>vim을 사용하는 것의 장점이 매우 크다고 생각하는데</li>
+      <li>막상 이유를 설명해보라고 하면 어렵다.</li>
+      <li>(사실 장점을 얻기 위해선 수많은 문제를 스스로 해결해야 하기도 하고)</li>
+    </ul>
+  </li>
+  <li>나같은 이상한 사람을 아직 본적이 없었다.</li>
+  <li>회사에서 점심먹고 산책하다가 yan도 비슷한 (악)취미가 있다는 것을 알았다.
+    <ul>
+      <li>vim 덕후로 수렴한 사람들은 비슷한 길을 걷는걸까</li>
+    </ul>
+  </li>
+  <li>아무튼 k8s도 궁금한 부분에 대해 로깅을 추가해서 빌드하고
+    <ul>
+      <li>내가 빌드한 버전으로 하나씩 갈아끼우는 일을 하고있다.</li>
+    </ul>
+  </li>
+  <li>우선 나같은 생각을 한 사람이라면 높은 확률로 <code class="highlighter-rouge">kubectl</code>수정을 시작할 것이다.</li>
+</ul>
+
+<h2 id="kubectl-빌드"><code class="highlighter-rouge">kubectl</code> 빌드</h2>
+
+<ul>
+  <li>빌드 스크립트를 따라가 보면 <code class="highlighter-rouge">cmd/kubectl</code>을 빌드하는 것을 알 수 있다.</li>
+  <li>빌드를 아무생각 없이 일단 해보면, 1시간 정도 걸린다.</li>
+  <li>결과는 아래의 바이너리들이 만들어진다.
+    <div class="highlighter-rouge"><pre class="highlight"><code>-rwxr-xr-x 1 sangwook sangwook 201M  6월 11 22:39 kube-apiserver
+-rwxr-xr-x 1 sangwook sangwook  65M  6월 11 22:40 kubectl
+-rwxr-xr-x 1 sangwook sangwook 141M  6월 11 22:39 kubelet
+...
+</code></pre>
+    </div>
+  </li>
+  <li>코드를 고칠때마다 빌드에 1시간을 기다렸다.
+    <ul>
+      <li>나는 쿠알못이기 때문에 모르면 이정도는 참아야 한다.</li>
+      <li>빌드 스크립트를 파는게 목적이 아니니.</li>
+    </ul>
+  </li>
+  <li>그러다가 도저히 참지 못하고
+    <ul>
+      <li>시간을 내서 빌드 스크립트를 읽었다.</li>
+      <li>결과적으로 빌드에 9분-10분 정도 걸리도록 시간을 줄였다.</li>
+      <li>이것도 느려서 못참겠지만, 더 빠르게 하는건 다음에 시간이 남을때 하자.</li>
+    </ul>
+  </li>
+  <li>하지만 또 10분씩 기다리는걸 참지 못하고.
+    <ul>
+      <li>빌드 스크립트를 좀 더 자세히 봤다.</li>
+      <li>테스트 코드를 돌리지 않도록 하는 옵션이 예전에 있었던것 같은데.</li>
+      <li>지금은 그 옵션이 동작하지 않는다.</li>
+      <li>일단 10분 기다리는걸 참는걸로..</li>
+    </ul>
+  </li>
+  <li>kubespray에서 kubectl, kubelet의 업데이트는.
+    <ul>
+      <li>hyperkube이미지의 kubectl과 호스트의 kubectl을 바이트 비교후</li>
+      <li>다르면 복사한다.</li>
+      <li><a href="https://github.com/sangwook/kubespray/blob/3d6fd491795adb8a38493afe6c2968a46051d5ff/roles/kubernetes/master/tasks/main.yml#L32">https://github.com/sangwook/kubespray/blob/3d6fd491795adb8a38493afe6c2968a46051d5ff/roles/kubernetes/master/tasks/main.yml#L32</a></li>
+    </ul>
+  </li>
+  <li>내가 빌드한 kubectl을 사용하도록 바이너리 경로를 변경하고.
+    <ul>
+      <li>클러스터의 config를 <code class="highlighter-rouge">~/.kube/sangwook-cluster.conf</code> 로 복사하고.</li>
+      <li><code class="highlighter-rouge">KUBECONFIG</code> 에 config 경로를 지정하고</li>
+      <li>kubectl 명령을 하면서 테스트하면 된다.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="apiserver-빌드"><code class="highlighter-rouge">apiserver</code> 빌드</h2>
+
+<ul>
+  <li>별거 없다.</li>
+  <li>apiserver는 다커 이미지만 만들어서, 이미지 주소를 변경만 하면.
+    <ul>
+      <li>(apiserver는 static-pod로 정의되어 있기 때문에)</li>
+      <li>manifest가 즉시 적용된다.</li>
+    </ul>
+  </li>
+  <li>다커 이미지를 만드는 것은 수 초 밖에 안 걸린다. (hyperkube 하나만 하면 10초 정도)</li>
+  <li>자주 수정하고 빌드하고 다커 이미지 만들고 하다보면
+    <ul>
+      <li>내가 방금 빌드한 버전으로 돌아가고 있는지 궁금할때가 있는데. (제대로 배포했나?)</li>
+      <li>빌드한 서버에서 <code class="highlighter-rouge">docker images --digests</code> 를 해서 digest sha256 값을 확인하고.
+        <div class="highlighter-rouge"><pre class="highlight"><code>REPOSITORY               TAG                    DIGEST                                                                  IMAGE ID     CREATED        SIZE
+sangwook/hyperkube-amd64 v1.9.5-sangwook-custom sha256:71d332a5b8cdb21329b9ca75c5aae454fa3d60c8a87b6088aaeee1720a8850f4 944446664a2b 32 minutes ago 619MB
+</code></pre>
+        </div>
+      </li>
+      <li>apiserver를 배포한 서버에서 나오는 digest sha256이 일치하는지 확인하면 된다. (IMAGE ID가 아니라는게 핵심)
+        <div class="highlighter-rouge"><pre class="highlight"><code>CONTAINER ID IMAGE                                                                                             COMMAND               CREATED        STATUS
+0b11ac196ea3 sangwook/hyperkube-amd64@sha256:71d332a5b8cdb21329b9ca75c5aae454fa3d60c8a87b6088aaeee1720a8850f4 "/hyperkube apiser..." 13 minutes ago Up 13 minutes
+</code></pre>
+        </div>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="etcd에-업데이트"><code class="highlighter-rouge">etcd</code>에 업데이트</h2>
+
+<ul>
+  <li>etcd와 통신하는 로직이 궁금하여 따라가다 보면.</li>
+  <li>코드를 따라가다가 스택을 자주 확인해야 하고,
+    <ul>
+      <li>스택에 해당하는 코드로 쉽게 이동해야 한다.</li>
+      <li>그것 때문에 아래와 같은 vim 플러그인을 만들어서 쓰고 있다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="/assets/2018/180619-vim-9f3e9941dc41c9ce800421e81a483fe22b8fa36a4233a39a30b1bb950b390f5f.gif" alt="2018/180619-vim.gif" /></p>
+
+<ul>
+  <li>처음엔 <code class="highlighter-rouge">kubectl get pods</code> 같은 get 로직을 따라 갔었는데.
+    <ul>
+      <li>기억에 남을만한 특별한 로직이 없었다.</li>
+    </ul>
+  </li>
+  <li>etcd 변경이 필요한. 예를 들면, service의 nodePort를 kubectl로 변경하면.
+    <ul>
+      <li>변경한 spec의 셀렉터와 변경후의 값만 request body로 해서</li>
+      <li>PATCH 메소드의 요청을 한다. (apiserver에)</li>
+      <li>apiserver가 요청을 받아서, etcd에 업데이트 한다.</li>
+    </ul>
+  </li>
+  <li>코드를 보다보면 etcd를 덤프해서 전후를 diff 하는 일을 반복적으로 하게된다.
+    <ul>
+      <li>덤프하는 올바른 방법을 몰라서</li>
+      <li>key목록을 가져오고 하나씩 get하는 스크립트를 만들어야 했다.</li>
+      <li>(하지만 분명 더 좋은 방법이 있겠지.)</li>
+      <li>[EDIT] 지금은 etcd 값이 변경되면 메시지를 받도록 k8s를 변경했는데, 이게 훨씬 편했다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="/assets/2018/180619-etcddump1-a96e434accf60983f0408b6413137ac1824f1ce2c90b450700c27bc91a5fbf0c.gif" alt="2018/180619-etcddump1.gif" /></p>
+
+<ul>
+  <li>etcd로 저장하는 로직에서 재밌게 본 코드들.
+    <ul>
+      <li><a href="https://github.com/sangwook/kubernetes/blob/f01a2bf98249a4db383560443a59bed0c13575df/staging/src/k8s.io/apiserver/pkg/endpoints/handlers/update.go#L101-L107">https://github.com/sangwook/kubernetes/blob/f01a2bf98249a4db383560443a59bed0c13575df/staging/src/k8s.io/apiserver/pkg/endpoints/handlers/update.go#L101-L107</a>
+        <ul>
+          <li>리소스 업데이트는 모두 이 거대한 메소드 안으로 들어온다.</li>
+        </ul>
+      </li>
+      <li><a href="https://github.com/sangwook/kubernetes/blob/f01a2bf98249a4db383560443a59bed0c13575df/staging/src/k8s.io/apiserver/pkg/endpoints/handlers/rest.go#L182-L186">https://github.com/sangwook/kubernetes/blob/f01a2bf98249a4db383560443a59bed0c13575df/staging/src/k8s.io/apiserver/pkg/endpoints/handlers/rest.go#L182-L186</a></li>
+      <li><a href="https://github.com/sangwook/kubernetes/blob/f01a2bf98249a4db383560443a59bed0c13575df/staging/src/k8s.io/apiserver/pkg/storage/etcd3/store.go#L263">https://github.com/sangwook/kubernetes/blob/f01a2bf98249a4db383560443a59bed0c13575df/staging/src/k8s.io/apiserver/pkg/storage/etcd3/store.go#L263</a>
+        <ul>
+          <li>etcd 업데이트를 끝까지 따라가면 여기까지 온다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>사실 저장하는 것 보다는, notify/watch 하는 부분이 핵심이다.</li>
+  <li>그리고 apiserver와 scheduler 사이의 통신하는 로직이나</li>
+  <li>apiserver와 kubelet 사이의 통신하는 로직이나</li>
+  <li><code class="highlighter-rouge">kubectl create -f xxx.yaml</code> 로 Service를 nodePort로 생성할때.
+    <ul>
+      <li>services, endpoints 각각 총 2번의 POST를 날리고.</li>
+      <li>iptables를 변경하는 로직</li>
+    </ul>
+  </li>
+  <li>등등등의 로직이 재밌었는데.</li>
+  <li>이걸 다 여기다 정리하려니 힘들고, 나같은 마이너 취향이 없을거 같아서.</li>
+  <li>일단 여기까지.</li>
+</ul>
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="&quot;Tech planet 2013&quot; 후기" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="Tech planet 2013 컨퍼런스를 다녀왔다. 기대했던 발표 내용은 사실 별거 없었다. (tumblr, twitter, facebook 이 어떻게 확장했는지도 인터넷에서 이미 다 공개되어 나오는 수준 정도밖에 설명을 안 해 주더라.) 예를 들면, Twitter 에서 MySQL..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="&quot;Tech planet 2013&quot; 후기"/>
+  <meta name="og:description"  content="Tech planet 2013 컨퍼런스를 다녀왔다. 기대했던 발표 내용은 사실 별거 없었다. (tumblr, twitter, facebook 이 어떻게 확장했는지도 인터넷에서 이미 다 공개되어 나오는 수준 정도밖에 설명을 안 해 주더라.) 예를 들면, Twitter 에서 MySQL..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2013/11/14/tech-planet-2013.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="&quot;Tech planet 2013&quot; 후기"/>
+  <meta name="twitter:description" content="Tech planet 2013 컨퍼런스를 다녀왔다. 기대했던 발표 내용은 사실 별거 없었다. (tumblr, twitter, facebook 이 어떻게 확장했는지도 인터넷에서 이미 다 공개되어 나오는 수준 정도밖에 설명을 안 해 주더라.) 예를 들면, Twitter 에서 MySQL..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>&quot;Tech planet 2013&quot; 후기</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">&quot;Tech planet 2013&quot; 후기</h1>
+    <p class="post-meta"><time datetime="2013-11-14T22:28:00+09:00" itemprop="datePublished">2013-11-14</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li>Tech planet 2013 컨퍼런스를 다녀왔다.</li>
+  <li>기대했던 발표 내용은 사실 별거 없었다. (tumblr, twitter, facebook 이 어떻게 확장했는지도 인터넷에서 이미 다 공개되어 나오는 수준 정도밖에 설명을 안 해 주더라.)</li>
+</ul>
+
+<p>예를 들면, Twitter 에서 MySQL의 스케일링을 어떻게 했는지 발표에서.</p>
+
+<ul>
+  <li>템포럴 샤딩으로 첫번째 확장을 했는데.</li>
+  <li>이게 시간순으로 쌓이기 때문에, 처음엔 그럴듯해 보였지만.</li>
+  <li>최근 데이터 INSERT 는 1개의 DB에만 이루어지고,</li>
+  <li>SELECT 도 최근의 데이터를 가진 1개의 DB에만 있기 때문에. 로드 밸런싱이 안 되는 문제가 있다.</li>
+  <li>그래서 우리는 Snowflake, Gizzard 같은걸 우리가 만들었다.</li>
+  <li>(난 그게 어떤식으로 구현되어있는지 궁금했는데…)</li>
+  <li>오늘 인터넷에서 찾아보니
+    <ul>
+      <li>Snowflake 는 유니크 ID 를 부여하는 역할이고.</li>
+      <li>Gizzard 는 적절하게 DB에 배분하는 역할이다.</li>
+    </ul>
+  </li>
+  <li>그리고 Tumblr 는 거의 모든 곳에 캐시로 떡칠을 하는 방식이었고.</li>
+  <li>Facebook 은 배포할때 설정을 한번에 하는 그런것에 대한 설명이었는데. 관심분야가 아니었다.</li>
+</ul>
+
+<p>그보다</p>
+
+<ul>
+  <li>거기서 만난 사람들과 이야기에서 많은 영감을 얻었다.</li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

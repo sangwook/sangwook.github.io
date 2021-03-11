@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="에버노트 동기화 프로토콜 성능 개선" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="문제 2008년에 2개의 샤드가 있었는데 6년동안 수십억 노트를 저장하는 400개의 샤드로 성장. 그래서 SyncChunk 를 만드는데 IO 작업이 엄청 많아짐. (싱크청크는 클라이언트가 업데이트해야할 목록인듯) DB는. MySQL note 는 note 테이블에 쌓이고 user_i..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="에버노트 동기화 프로토콜 성능 개선"/>
+  <meta name="og:description"  content="문제 2008년에 2개의 샤드가 있었는데 6년동안 수십억 노트를 저장하는 400개의 샤드로 성장. 그래서 SyncChunk 를 만드는데 IO 작업이 엄청 많아짐. (싱크청크는 클라이언트가 업데이트해야할 목록인듯) DB는. MySQL note 는 note 테이블에 쌓이고 user_i..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/02/02/synchronization-speedupification.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="에버노트 동기화 프로토콜 성능 개선"/>
+  <meta name="twitter:description" content="문제 2008년에 2개의 샤드가 있었는데 6년동안 수십억 노트를 저장하는 400개의 샤드로 성장. 그래서 SyncChunk 를 만드는데 IO 작업이 엄청 많아짐. (싱크청크는 클라이언트가 업데이트해야할 목록인듯) DB는. MySQL note 는 note 테이블에 쌓이고 user_i..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>에버노트 동기화 프로토콜 성능 개선</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">에버노트 동기화 프로토콜 성능 개선</h1>
+    <p class="post-meta"><time datetime="2014-02-02T00:02:00+09:00" itemprop="datePublished">2014-02-02</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>문제</p>
+
+<ul>
+  <li>2008년에 2개의 샤드가 있었는데</li>
+  <li>6년동안 수십억 노트를 저장하는 400개의 샤드로 성장.</li>
+  <li>그래서 SyncChunk 를 만드는데 IO 작업이 엄청 많아짐. (싱크청크는 클라이언트가 업데이트해야할 목록인듯)</li>
+  <li>DB는. MySQL
+    <ul>
+      <li>note 는 note 테이블에 쌓이고</li>
+      <li>user_id, USN 복합키로 인덱스가 걸려있다.</li>
+      <li>근데 실제 행 데이터는 PK순으로 정렬되어 디스크에 clustered 된다.</li>
+      <li>e.g. user_id=123 AND USN &gt; 847 인 100개의 object를 가져와.
+        <ul>
+          <li>해당 user_id 의 데이터가 있는 9개의 다른 테이블을 검사해서 병합하고 USN을 찾아 100개만 리턴 할 것이다.</li>
+          <li>최악의 경우 1개의 요청을 처리하기 위해 디스크에서 수천개의 비순차적인 페이지를 읽을 가능성이 있다.</li>
+        </ul>
+      </li>
+      <li>이건 엄청나게 비싼 IO작업이고 클라이언트에게 응답을 하는 시간도 느리다.</li>
+      <li>개인, 회사 간의 노트 공유가 급격히 많아지고 이 문제는 점점 심각해졌다.</li>
+      <li>SSD 로 땜빵한 덕분에 시간을 벌었지만 근본적인 해결책은 아니었다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>해결</p>
+
+<ul>
+  <li>SyncChunk 를 만드는데 많은 테이블을 찾지 않도록 구조를 바꾸고 싶다.</li>
+  <li>하나의 테이블에 모든 것을 인덱스 하는 구조로 “Sync Indet” 테이블을 만듬
+    <ul>
+      <li>PK 는 [user_id, USN]
+        <ul>
+          <li>이유는: 싱크에 필요한 순서대로 디스크에 클러스터되도록 하기 위해</li>
+        </ul>
+      </li>
+      <li>row는 단일 IO에 가능하면 많이 처리할 수 있도록 작게 설계되었다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>sync_index 테이블:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>CREATE TABLE IF NOT EXISTS sync_index (
+    user_id int UNSIGNED NOT NULL,
+    update_sequence_number int UNSIGNED NOT NULL,
+        /* USN */
+    entry_type tinyint NOT NULL,
+        /* tag, note와 같은 이 행이 참조하는 타입. 엔터티는 active,inactive,expunged 세가지 상태가 있는데 이걸 어디다 저장한다는 거지? */
+    notebook_id int UNSIGNED,
+        /* 권한은 대부분 노트북 수준에서 부여되고. note에 접근하지 않고도 notebook_id 로 필터링 가능 */
+    grave_notebook_id int UNSIGNED,
+    object_id int UNSIGNED,
+    guid binary(16),
+    content_class_hash int UNSIGNED,
+        /* Evernote Hello, Evernote Food 등은 note에 contentClass가 정의됨. 그리고 prefix가 일치하는 note와만 동기화 가능. 공간절약을 위해 content class 대신 hash 를 저장함. */
+    recipient_id int UNSIGNED DEFAULT NULL,
+    service_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY (user_id, update_sequence_number),
+    KEY objectid_entrytype_idx (object_id, entry_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+</code></pre>
+</div>
+
+<p><a href="http://blog.evernote.com/tech/2014/01/28/synchronization-speedupification/">http://blog.evernote.com/tech/2014/01/28/synchronization-speedupification/</a></p>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

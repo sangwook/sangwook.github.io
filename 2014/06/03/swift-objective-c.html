@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Objective-C 보다 Swift 가 좋은 점" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="내 느낌은. Objective-C 는 다른 언어와 다른 점이 많아서 코딩할때 신경써야 할 점이 많았는데. Swift는 다른 언어와 비슷한 점이 많아서, 따로 공부하거나 외우지 않아도 직관적이라 좋다. The Swift Programming Language: The Basics 변수..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Objective-C 보다 Swift 가 좋은 점"/>
+  <meta name="og:description"  content="내 느낌은. Objective-C 는 다른 언어와 다른 점이 많아서 코딩할때 신경써야 할 점이 많았는데. Swift는 다른 언어와 비슷한 점이 많아서, 따로 공부하거나 외우지 않아도 직관적이라 좋다. The Swift Programming Language: The Basics 변수..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/06/03/swift-objective-c.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Objective-C 보다 Swift 가 좋은 점"/>
+  <meta name="twitter:description" content="내 느낌은. Objective-C 는 다른 언어와 다른 점이 많아서 코딩할때 신경써야 할 점이 많았는데. Swift는 다른 언어와 비슷한 점이 많아서, 따로 공부하거나 외우지 않아도 직관적이라 좋다. The Swift Programming Language: The Basics 변수..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Objective-C 보다 Swift 가 좋은 점</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Objective-C 보다 Swift 가 좋은 점</h1>
+    <p class="post-meta"><time datetime="2014-06-03T13:59:00+09:00" itemprop="datePublished">2014-06-03</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li>내 느낌은.</li>
+  <li>Objective-C 는 다른 언어와 다른 점이 많아서 코딩할때 신경써야 할 점이 많았는데.</li>
+  <li>Swift는 다른 언어와 비슷한 점이 많아서, 따로 공부하거나 외우지 않아도 직관적이라 좋다.</li>
+  <li><a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/TheBasics.html">The Swift Programming Language: The Basics</a></li>
+</ul>
+
+<h3 id="변수">변수</h3>
+
+<p>타입을 명시 안 해도 된다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>let label = "The width is " // 타입을 명시 안 해도 String 타입이 됨
+let implicitInteger = 70 // 타입을 명시 안 해도 Integer 타입이 됨
+let implicitDouble = 70.0 // 타입을 명시 안 해도 Double 타입이 됨
+let explicitDouble: Double = 70 // 타입을 명시 할 수도 있다.
+</code></pre>
+</div>
+
+<p>implicit(암묵적) 타입 변환은 아래와 같이 안 되고. 명시적으로 변환해야한다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>let label = "The width is "
+let width = 94
+let widthLabel = label + String(width) //직접 String 타입으로 변환해야 한다.
+</code></pre>
+</div>
+
+<p>(참고로 <code class="highlighter-rouge">let</code> 은 상수, <code class="highlighter-rouge">var</code> 는 변수다. 직관적이야)</p>
+
+<h3 id="string-interpolation">String Interpolation</h3>
+
+<p>String Interpolation이 가능하다! (javascript도, python도 이건 안 된다.)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>//objc 라면 아래와 같은 스타일의 코드가
+[NSString stringWithFormat:@"blah %@ asdf %@ test",firstName,lastName];
+
+//아래와 같은 스타일로 바뀐다.
+let apples = 3
+let oranges = 5
+let appleSummary = "I have \(apples) apples."
+let fruitSummary = "I have \(apples + oranges) pieces of fruit."
+//게다가 함수 호출도 가능하다.
+let fruitSummary = "I have \(testFunction(100)) pieces of fruit."
+</code></pre>
+</div>
+
+<h3 id="제어문">제어문</h3>
+
+<p>문자열에 switch/case문이 가능하다. (당연한거 아냐? 라고 생각하겠지만 objc 에선…)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>let vegetable = "red pepper"
+switch vegetable {
+case "celery":
+    let vegetableComment = "Add some raisins and make ants on a log."
+case "cucumber", "watercress":
+    let vegetableComment = "That would make a good tea sandwich."
+case let x where x.hasSuffix("pepper"):
+    let vegetableComment = "Is it a spicy \(x)?"
+default:
+    let vegetableComment = "Everything tastes good in soup."
+}
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">if let</code> 으로 if문에 변수에 값을 넣는게 가능하다. 특이하다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>let numberSymbol: Character = "三" // 한자로 숫자 3
+// Int? 는 값이 대입되지 않은 상태인 nil 이 가능한 변수.
+var possibleIntegerValue: Int?
+
+// numberSymbol 값에 따라 switch/case 로 1~4로 매핑한다.
+switch numberSymbol {
+case "1", "١", "一", "๑":
+    possibleIntegerValue = 1
+case "2", "٢", "二", "๒":
+    possibleIntegerValue = 2
+case "3", "٣", "三", "๓":
+    possibleIntegerValue = 3
+case "4", "٤", "四", "๔":
+    possibleIntegerValue = 4
+default:
+    break
+}
+
+// possibleIntegerValue 에 값이 셋팅이 되었을때만 if가 true로 성공함.
+// let 이 성공여부를 true/false 로 리턴한다고 이해하면 쉬울듯.
+if let integerValue = possibleIntegerValue {
+    println("The integer value of \(numberSymbol) is \(integerValue).")
+} else {
+    println("An integer value could not be found for \(numberSymbol).")
+}
+</code></pre>
+</div>
+
+<p>아래의 코드와 같은 일이 가능하다. optional chaining 이라고 부르는 듯.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>// residence 가 존재하면 residence 의 numberOfRooms 에 접근한다.
+if let roomCount = john.residence?.numberOfRooms {
+    // roomCount 변수 사용
+}
+</code></pre>
+</div>
+
+<p>위와 같은 기능은 마치 <code class="highlighter-rouge">CoffeeScript</code> 에서 <code class="highlighter-rouge">sangwook?.like</code> 를 하면 <code class="highlighter-rouge">javascript</code> 코드 <code class="highlighter-rouge">typeof sangwook !== "undefined" &amp;&amp; sangwook !== null ? sangwook.like</code> 로 변환되는 것과 비슷하다. 좋다 좋아!</p>
+
+<h3 id="functions">functions</h3>
+
+<p>함수 parameter 에 <code class="highlighter-rouge">name:String = "default"</code> 처럼 디폴트 값을 지정할 수 있다. <code class="highlighter-rouge">...</code> 를 사용해서 가변 parameter도 가능함. <a href="http://en.wikipedia.org/wiki/Variadic_function">Variadic function</a></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>func join(string s1: String, toString s2: String, withJoiner joiner: String = " ") -&gt; String {
+    return s1 + joiner + s2
+}
+</code></pre>
+</div>
+
+<p>함수가 2개 이상의 값도 리턴할 수 있다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>func count(string: String) -&gt; (vowels: Int, consonants: Int, others: Int) {
+    var vowels = 0, consonants = 0, others = 0
+    for character in string {
+        // ... 블라블라
+    }
+    // 아래와 같이 tuple 로 여러개를 리턴하는것이 가능함.
+    return (vowels, consonants, others)
+}
+
+let total = count("some arbitrary string!")
+println("\(total.vowels) vowels and \(total.consonants) consonants")
+</code></pre>
+</div>
+
+<h3 id="closures">Closures</h3>
+
+<p>ObjC도 blocks로 클로저가 가능하긴 했지만. 직관적이지 않았다.</p>
+
+<p>swift의 클로저 문법:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w"> </span><span class="err">(parameters)</span><span class="w"> </span><span class="err">-&gt;</span><span class="w"> </span><span class="err">return</span><span class="w"> </span><span class="err">type</span><span class="w"> </span><span class="err">in</span><span class="w">
+    </span><span class="err">statements</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>(클로저에 <code class="highlighter-rouge">in</code> 을 쓰는 문법은 내가 본 언어들 중 처음이다.)</p>
+
+<p><code class="highlighter-rouge">numbers</code> 배열의 각 값에 대해 <code class="highlighter-rouge">digitNames</code> 에 해당하는 문자로 치환하는 예제:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>let digitNames = [
+    0: "Zero", 1: "One", 2: "Two", 3: "Three", 4: "Four",
+    5: "Five", 6: "Six", 7: "Seven", 8: "Eight", 9: "Nine"
+]
+let numbers = [16, 58, 510]
+
+let strings = numbers.map {
+    (var number) -&gt; String in
+        var output = ""
+        while number &gt; 0 {
+            output = digitNames[number % 10]! + output
+            number /= 10
+    }
+    return output
+}
+// 결과: strings 는 ["OneSix", "FiveEight", "FiveOneZero"] 이 들어간다.
+</code></pre>
+</div>
+
+<p>클로저 함수:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>let names = ["Chris", "Alex", "Ewa", "Barry", "Daniella"]
+
+// 매개변수 s1, s2 를 받아서, s1 이 더 큰지 여부를 리턴하는 함수:
+func backwards(s1: String, s2: String) -&gt; Bool {
+    return s1 &gt; s2
+}
+
+var reversed = sort(names, backwards)
+// 결과: reversed 는 ["Ewa", "Daniella", "Chris", "Barry", "Alex"]
+</code></pre>
+</div>
+
+<p>한개의 expression 이라면 아래와 같이 짧게 쓸 수도 있고. implicit 하게 리턴 한다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>reversed = sort(names, { s1, s2 in s1 &gt; s2 } )
+</code></pre>
+</div>
+
+<p>아래와 같이 더 짧게 쓸 수 있다!!</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>reversed = sort(names, { $0 &gt; $1 } ) //$0 는 첫번째 매개변수, $1 는 두번째 매개변수의 의미.
+</code></pre>
+</div>
+
+<p>함수를 반환하는 함수:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>func makeIncrementor(forIncrement amount: Int) -&gt; () -&gt; Int {
+    var runningTotal = 0
+    func incrementor() -&gt; Int {
+        runningTotal += amount
+        return runningTotal
+    }
+    return incrementor // 함수를 리턴한다!
+}
+</code></pre>
+</div>
+
+<h3 id="range">range</h3>
+
+<p>range 가 된다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>for index in 1...5 {
+    println("\(index) times 5 is \(index * 5)")
+}
+
+// 이런것도 된다.
+shoppingList[4...6] = ["Bananas", "Apples"]
+</code></pre>
+</div>
+
+<h3 id="추가">추가</h3>
+
+<ul>
+  <li>Swift는 Scala와 Groovy와 F#과 CoffeeScript와 ActionScript와 C++과 Haskell과 C#과 TypeScript와 Clojure와 Dart와 go와 ruby와 Verilog와 Kotlin와 ML과 Haxe와 Java에서 영감을 얻은 언어이다.</li>
+  <li><a href="http://glaforge.appspot.com/article/apple-s-swift-programming-language-inspired-by-groovy">Groovy 와 비슷한 점</a></li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

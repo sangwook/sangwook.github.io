@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="코드 품질" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="2015년 4월 17일자 xkcd: Code Quality 독학으로 공부했기 때문에, 코드가 조금 지저분할 수 있어. 괜찮으니까 보여줘. 와우 이것은 마치 사진과 도끼만 가지고 아이가 지은 집 안에 있는 기분이다. 이것은 마치 엑셀 함수만 알고있는 휴대폰 자동완성 기능을 사용하여 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="코드 품질"/>
+  <meta name="og:description"  content="2015년 4월 17일자 xkcd: Code Quality 독학으로 공부했기 때문에, 코드가 조금 지저분할 수 있어. 괜찮으니까 보여줘. 와우 이것은 마치 사진과 도끼만 가지고 아이가 지은 집 안에 있는 기분이다. 이것은 마치 엑셀 함수만 알고있는 휴대폰 자동완성 기능을 사용하여 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2015/04/19/xkcd-code-quality.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="코드 품질"/>
+  <meta name="twitter:description" content="2015년 4월 17일자 xkcd: Code Quality 독학으로 공부했기 때문에, 코드가 조금 지저분할 수 있어. 괜찮으니까 보여줘. 와우 이것은 마치 사진과 도끼만 가지고 아이가 지은 집 안에 있는 기분이다. 이것은 마치 엑셀 함수만 알고있는 휴대폰 자동완성 기능을 사용하여 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>코드 품질</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">코드 품질</h1>
+    <p class="post-meta"><time datetime="2015-04-19T15:59:00+09:00" itemprop="datePublished">2015-04-19</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><img src="/assets/2015/150419-eaee750bfa65f941f75f709b8209828c-tumblr_inline_nn1kprYG4n1r7z9vf_540-71c90db51cfdff16aff40ffc3d75f5dd1f55a39ab56b43f412608450b0de3a70.png" alt="2015/150419-eaee750bfa65f941f75f709b8209828c-tumblr_inline_nn1kprYG4n1r7z9vf_540.png" /></p>
+
+<p><a href="http://xkcd.com/1513/">2015년 4월 17일자 xkcd: Code Quality</a></p>
+
+<ul>
+  <li>독학으로 공부했기 때문에, 코드가 조금 지저분할 수 있어.</li>
+  <li>괜찮으니까 보여줘.</li>
+  <li>와우</li>
+  <li>이것은 마치 사진과 도끼만 가지고 아이가 지은 집 안에 있는 기분이다.</li>
+  <li>이것은 마치 엑셀 함수만 알고있는 휴대폰 자동완성 기능을 사용하여 변호사가 쓴 샐러드 레시피 같다.</li>
+  <li>이것은 마치 IKEA 안에서 싸우는 커플의 대화를 기록하여, 에러없이 컴파일 될때까지 무작위로 편집한 것 같다.</li>
+  <li>알았어, 스타일 가이드를 읽을게.</li>
+</ul>
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

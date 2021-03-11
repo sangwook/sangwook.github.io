@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="2017년 Rails, JavaScript에 대한 DHH의 생각" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="DHH의 생각(을 읽은 후 내 생각) (Rails를 만든 것으로 유명한) DHH가 Quora에서 질문을 받는 세션을 가졌다. [1] 재밌는 질문들이 많았다. 예를 들면 “2017년에 Rails 프레임워크를 배울 가치가 뭐야?” “JavaScript 프레임워크가 Rails를 먹게될까..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="2017년 Rails, JavaScript에 대한 DHH의 생각"/>
+  <meta name="og:description"  content="DHH의 생각(을 읽은 후 내 생각) (Rails를 만든 것으로 유명한) DHH가 Quora에서 질문을 받는 세션을 가졌다. [1] 재밌는 질문들이 많았다. 예를 들면 “2017년에 Rails 프레임워크를 배울 가치가 뭐야?” “JavaScript 프레임워크가 Rails를 먹게될까..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2017/02/21/ruby-dhh-javascript-rails-redux.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2017/170221-1-f052746c2682481166b401cc114c3579db315f87be47ec17c73e58fb61a748f3.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="541"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="2017년 Rails, JavaScript에 대한 DHH의 생각"/>
+  <meta name="twitter:description" content="DHH의 생각(을 읽은 후 내 생각) (Rails를 만든 것으로 유명한) DHH가 Quora에서 질문을 받는 세션을 가졌다. [1] 재밌는 질문들이 많았다. 예를 들면 “2017년에 Rails 프레임워크를 배울 가치가 뭐야?” “JavaScript 프레임워크가 Rails를 먹게될까..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2017/170221-1-f052746c2682481166b401cc114c3579db315f87be47ec17c73e58fb61a748f3.jpg">
+
+  <title>2017년 Rails, JavaScript에 대한 DHH의 생각</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">2017년 Rails, JavaScript에 대한 DHH의 생각</h1>
+    <p class="post-meta"><time datetime="2017-02-21T21:51:00+09:00" itemprop="datePublished">2017-02-21</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><img src="/assets/2017/170221-1-f052746c2682481166b401cc114c3579db315f87be47ec17c73e58fb61a748f3.jpg" alt="2017/170221-1.jpg" /></p>
+
+<h2 id="dhh의-생각을-읽은-후-내-생각">DHH의 생각(을 읽은 후 내 생각)</h2>
+<ul>
+  <li>(Rails를 만든 것으로 유명한) DHH가 Quora에서 질문을 받는 세션을 가졌다. <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a></li>
+  <li>재밌는 질문들이 많았다.</li>
+  <li>예를 들면
+    <ul>
+      <li>“2017년에 Rails 프레임워크를 배울 가치가 뭐야?”</li>
+      <li>“JavaScript 프레임워크가 Rails를 먹게될까?”</li>
+      <li>“왜 Python이 아니라 Ruby로 Rails를 만들었니?”</li>
+      <li>등</li>
+    </ul>
+  </li>
+  <li>질문만 봐도 막 읽고 싶어진다.</li>
+  <li>게다가 DHH는 글을 잘 쓴다.</li>
+  <li>전부 읽은 후, 내 생각과 비슷하다고 느꼈다.
+    <ul>
+      <li>오래전부터 내가 DHH에게 영향을 많이 받았다는 증거겠지.</li>
+    </ul>
+  </li>
+</ul>
+
+<blockquote>
+  <p>While we’ve seen a lot a progress in the JavaScript world, we’ve also seen a regression to the complexity-laden world that Rails offered refuge from in the early days.
+Back then the complexity merchant of choice was J2EE, but the complaints are uncannily similar to those leveled against JavaScript today.
+That people spent hours, if not days, just setting up the skeletons.
+The basic build configurations.
+Assembling and cherry-picking from lots of little libraries and frameworks to put together their own snowflake house variety.</p>
+</blockquote>
+
+<ul>
+  <li>13년 전 J2EE와 비교할 정도로 현재의 JavaScript world를 복잡하다고 DHH는 생각하고 있다.</li>
+  <li>나도 현재 JavaScript world에서 만들어지는 것들을 좋아하지 않는다.
+    <ul>
+      <li>만약 spreadsheet 정도의 SPA를 만들어야 한다면 redux 등은 어쩔 수 없는 선택지다.</li>
+      <li>하지만 선택하기 전에, 오버엔지니어링이 아닌지 일단 의심해봐야 한다.
+        <ul>
+          <li>오버엔지니어링, 이른 최적화는 모든 악의 근원이다.</li>
+        </ul>
+      </li>
+      <li>JavaScript world는 앞으로 크게 변할 것이다.</li>
+      <li>아마 몇년 뒤에는 지금과 많이 달라지고, 그 때는 나도 생각이 달라질 수 있겠지.
+        <ul>
+          <li>hibernate를 처음 봤을 때의 생각과, 지금의 생각이 다른 것 처럼.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<blockquote>
+  <p>That by formalizing conventions, eliminating valueless choices, and offering a full-stack framework that provides great defaults for anyone who wants to create a complete application, we can make dramatic strides of productivity.
+…
+The vast majority of activity today is for yet another option on the a la carte menu. Yet another build system, yet another view library, yet another ORM. Very little activity in integrated solutions.</p>
+</blockquote>
+
+<ul>
+  <li>Rails는 full-stack framework를 목표로 하고 있다.
+    <ul>
+      <li>conventions을 formalizing</li>
+      <li>가치없는 선택지 제거</li>
+      <li>디폴트 제공</li>
+      <li>등으로 높은 생산성을 만든다.</li>
+    </ul>
+  </li>
+  <li>즉, Rails는 integrated solutions 를 지향한다.</li>
+  <li>이 목표의 프레임워크는 Rails가 독보적이다.</li>
+  <li>Rails 이외의 대다수 프레임워크는 그 반대편에 있고, 아래의 방향으로 개발된다.
+    <ul>
+      <li>또 다른 option을 만든다.</li>
+      <li>또 다른 빌드 시스템을 만든다.</li>
+      <li>또 다른 view library를 만든다.</li>
+      <li>또 다른 ORM을 만든다.</li>
+    </ul>
+  </li>
+</ul>
+
+<blockquote>
+  <p>You get to use Ruby, which, even in a world that has rediscovered the benefits of functional programming and immutability, remains the most extraordinarily beautiful and luxurious language I’ve yet to encounter.
+Just look at some code.
+I dare you not to fall in love.</p>
+</blockquote>
+
+<ul>
+  <li>Ruby는 함수형 언어의 장점이 재발견된 이 시대에 와서도 DHH가 본 언어중 가장 아름다운 언어라고.</li>
+  <li>동의 한다.</li>
+  <li>사실 난 python과 ruby의 선택 시점에서 ruby를 선택했던 이유는 처음엔 단순했다.
+    <ul>
+      <li>string interpolation이 ruby에선 되고, python은 안 되는게 가장 컸다. <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a>
+        <ul>
+          <li>최근 python3.6 부터 python도 가능하게 됐다. <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a></li>
+          <li>하지만 앞에 <code class="highlighter-rouge">f</code>를 붙이는 것을 보니, 역시 python과 ruby는 보는 길이 다르다.</li>
+        </ul>
+      </li>
+      <li>나는 4-spaces 보다 2-spaces가 좋다. (사소하다.)</li>
+      <li>python 코드도 가끔 읽을 때가 있는데,
+        <ul>
+          <li>매일 python을 쓰는게 아닌 나에겐 python의 list comprehensions는 익숙해 지지가 않는다.
+            <ul>
+              <li>e.g. <code class="highlighter-rouge">[x**2 for x in range(10)]</code></li>
+            </ul>
+          </li>
+          <li>그보다 ruby의 블록이 나에게는 훨씬 쉽고, 코딩도 생각의 속도로 가능하고, 읽는 것도 자연스럽다.
+            <ul>
+              <li>e.g. <code class="highlighter-rouge">(0..9).map{|x|x**2}</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="ruby-24">Ruby 2.4</h2>
+<ul>
+  <li>지난 크리스마스, (2016-12-25)</li>
+  <li>ruby2.3 이후 1년만에 ruby2.4가 나왔다. <a href='#fn:4' class='footnote' id='fnref:4'>[4]</a> <a href='#fn:5' class='footnote' id='fnref:5'>[5]</a></li>
+  <li>반올림 함수(<code class="highlighter-rouge">Float#round</code>)의 디폴트 동작이 even-half가 뒤는 무시무시한 이야기가 있었다.
+    <ul>
+      <li>실제 preview3 까지 <code class="highlighter-rouge">2.5.round</code>의 결과가 <code class="highlighter-rouge">2</code> 였다.</li>
+      <li>많은 논란 끝에 결과적으로는 even-half로 동작하는 옵션이 추가되는 걸로 끝났다.</li>
+      <li>even-half 옵션을 내가 쓸 일이 있을까.</li>
+    </ul>
+  </li>
+  <li>rails의 ActiveSupport에 있던 <code class="highlighter-rouge">Hash#transform_values</code>가 core에 포함되었다.</li>
+  <li>pry의 <code class="highlighter-rouge">binding.pry</code>와 동일한 기능이 irb에도 <code class="highlighter-rouge">binding.irb</code>로 추가됐다고 한다.
+    <ul>
+      <li>하지만 pry대신 irb를 쓸 이유는 딱히 없어보인다.</li>
+    </ul>
+  </li>
+  <li>true/false만 리턴하는 <code class="highlighter-rouge">Regexp#match?</code> 가 추가되었다.
+    <ul>
+      <li><code class="highlighter-rouge">Regexp#match</code> 보다 (당연히) 빠르다고 한다.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">MatchData#named_captures</code>가 추가되었다.
+    <ul>
+      <li>아래처럼 이름있는 captures를 Hash로 리턴하는 메소드인데, 아주 편하겠다.
+        <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="sr">/(?&lt;fname&gt;.+) (?&lt;lname&gt;.+)/</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="s1">'Ned Stark'</span><span class="p">).</span><span class="nf">named_captures</span>
+<span class="c1">#=&gt; {"fname"=&gt;"Ned", "lname"=&gt;"Stark"}</span>
+</code></pre>
+        </div>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="https://www.quora.com/session/David-Heinemeier-Hansson/1">https://www.quora.com/session/David-Heinemeier-Hansson/1</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="https://en.wikipedia.org/wiki/String_interpolation#Ruby_.2F_Crystal">https://en.wikipedia.org/wiki/String_interpolation#Ruby_.2F_Crystal</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="https://www.python.org/dev/peps/pep-0498/">https://www.python.org/dev/peps/pep-0498/</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:4" id="fn:4" class="reversefootnote">[4]</a>:
+    </span>
+    <span class="content"><a href="https://www.ruby-lang.org/en/news/2016/12/25/ruby-2-4-0-released/">https://www.ruby-lang.org/en/news/2016/12/25/ruby-2-4-0-released/</a> <a href="#fnref:4" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:5" id="fn:5" class="reversefootnote">[5]</a>:
+    </span>
+    <span class="content"><a href="http://nithinbekal.com/posts/ruby-2-4-features/">http://nithinbekal.com/posts/ruby-2-4-features/</a> <a href="#fnref:5" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="우분투16과 KDE" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="오랫동안 Ubuntu 14.04 LTS 를 사용하고 있었다. Unity 도 불편했지만 적응했고 익숙해졌다. 하지만 다음 OS는 Unity 를 사용하지 않기로 다짐했다. 왜? 라고 묻는다면 명확한 답을 못하겠다. 살짝 느린 느낌? 이라는 (내가 싫어하는) 비과학적인 답을 해야한다. ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="우분투16과 KDE"/>
+  <meta name="og:description"  content="오랫동안 Ubuntu 14.04 LTS 를 사용하고 있었다. Unity 도 불편했지만 적응했고 익숙해졌다. 하지만 다음 OS는 Unity 를 사용하지 않기로 다짐했다. 왜? 라고 묻는다면 명확한 답을 못하겠다. 살짝 느린 느낌? 이라는 (내가 싫어하는) 비과학적인 답을 해야한다. ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2016/10/11/ubuntu-1604-kde.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="우분투16과 KDE"/>
+  <meta name="twitter:description" content="오랫동안 Ubuntu 14.04 LTS 를 사용하고 있었다. Unity 도 불편했지만 적응했고 익숙해졌다. 하지만 다음 OS는 Unity 를 사용하지 않기로 다짐했다. 왜? 라고 묻는다면 명확한 답을 못하겠다. 살짝 느린 느낌? 이라는 (내가 싫어하는) 비과학적인 답을 해야한다. ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>우분투16과 KDE</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">우분투16과 KDE</h1>
+    <p class="post-meta"><time datetime="2016-10-11T21:36:00+09:00" itemprop="datePublished">2016-10-11</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li><img src="/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg" alt="2016/161011-ubuntu16-screenfetch.jpg" /></li>
+  <li>오랫동안 Ubuntu 14.04 LTS 를 사용하고 있었다.
+    <ul>
+      <li>Unity 도 불편했지만 적응했고 익숙해졌다.</li>
+      <li>하지만 다음 OS는 Unity 를 사용하지 않기로 다짐했다.</li>
+      <li>왜?
+        <ul>
+          <li>라고 묻는다면 명확한 답을 못하겠다.</li>
+          <li>살짝 느린 느낌? 이라는 (내가 싫어하는) 비과학적인 답을 해야한다.</li>
+        </ul>
+      </li>
+      <li>아무튼 다음에는 <code class="highlighter-rouge">archlinux</code> 또는 <code class="highlighter-rouge">debian</code> 처럼 rolling update 가 가능한 OS를 쓰고 싶었다.</li>
+    </ul>
+  </li>
+  <li>처음에는 <code class="highlighter-rouge">archlinux</code> 기반에 tiling WM을 검토했다.
+    <ul>
+      <li>다른 hdd 파티션에 <code class="highlighter-rouge">archlinux</code> 와 WM 으로 <code class="highlighter-rouge">i3wm</code> 을 설치했다.</li>
+      <li><code class="highlighter-rouge">i3wm</code> 을 선택한 이유는 가장 많이 쓰이기 때문이다. <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a> <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a> <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a></li>
+      <li>결과적으로 <code class="highlighter-rouge">i3wm</code> 은 사용하길 포기했다.
+        <ul>
+          <li>많은 문제가 있었고, 하나씩 문제를 해결했지만.</li>
+          <li>아래의 문제를 해결하다가 너무 시간을 쓰는 것 같아서 현재 미룬 상태이다.
+            <ul>
+              <li>[문제1] wine 기반에 kakaotalk 을 설치하면 tiling 이 제대로 동작하지 않았다.
+                <ul>
+                  <li>wine만 예외로 tiling 을 disable 했지만. 그래도 이상하게 동작했다.</li>
+                </ul>
+              </li>
+              <li>[문제2] chrome 이 느리다.
+                <ul>
+                  <li>정확히는 url 입력 bar 에서 키 입력에 지연이 있다.</li>
+                  <li>또 탭 이동, 페이지 로딩 등에서 약간의 지연이 있다.</li>
+                  <li>아마도 ubuntu 패키지 등에서 자동으로 해결해주던 그래픽 드라이버가 <code class="highlighter-rouge">i3wm</code> 에서는 수동으로 설정을 해줘야 하는 것으로 추측함.</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>2016-03-13 알파고 vs. 이세돌 경기를 매일 재밌게 보는데 발견한 사실.
+    <ul>
+      <li>알파고는 Ubuntu14, Unity에서 돌아가는 것으로 보인다.</li>
+      <li>근거1. <img src="/assets/2016/161011-ubuntu16-alphago-1-246ac004e646202179647c76eca6eb822b1eb4f587317e24d41273e2ace24d04.jpg" alt="2016/161011-ubuntu16-alphago-1.jpg" /></li>
+      <li>근거2. <img src="/assets/2016/161011-ubuntu16-alphago-2-283ceb53b9d506f21b0e87fe68ec3641035dca8ad81e19babd9c38e35fb01e97.jpg" alt="2016/161011-ubuntu16-alphago-2.jpg" /></li>
+    </ul>
+  </li>
+  <li>2016-04-21 Ubuntu 16.04 가 릴리즈 되었다. <a href='#fn:4' class='footnote' id='fnref:4'>[4]</a> <a href='#fn:5' class='footnote' id='fnref:5'>[5]</a>
+    <ul>
+      <li>바로 업그레이드 하려고 했으나, 일이 바빠서 미뤘다.</li>
+      <li>역시 LTS는 16.04.1 이 나오고 업그레이드를 해야한다.</li>
+    </ul>
+  </li>
+  <li>2016-07-22 Ubuntu 16.04.1 이 릴리즈 되었다. <a href='#fn:6' class='footnote' id='fnref:6'>[6]</a></li>
+  <li>회사에 KDE를 좋아하는 쿠퍼에게 설득되서 KDE를 사용해보기로 했다.
+    <ul>
+      <li>KDE의 가장 큰 장점은 file manager인 dolphin 매우 좋다는 점이다.</li>
+      <li><img src="/assets/2016/161011-ubuntu16-dolphin-dd3bf87733960876295ec4425d8a0e035cf863f64f47fad9d36ba0c250f002d3.jpg" alt="2016/161011-ubuntu16-dolphin.jpg" /></li>
+      <li>나는 원래 주로 shell에서 파일관리를 하는 편이라</li>
+      <li>Ubuntu14에서 사용하던 <code class="highlighter-rouge">GNOME Files</code>(=Nautilus) 에도 딱히 불만이 없었다.</li>
+      <li>Dolphin 을 몇 주 사용해본 결과 아주 만족하고 있는데, 아래의 장점이 있다.
+        <ul>
+          <li>split 이 된다는 점.</li>
+          <li>아래에 shell이 나온다는 점.</li>
+          <li>directory 변경 시 아래의 shell 에 자동으로 cd가 된다는 점.</li>
+        </ul>
+      </li>
+      <li>적어도 macOS의 그지같은 <code class="highlighter-rouge">Finder</code> 보다는 훨씬 좋다.</li>
+      <li>multiple rename 이 혹시 regex 를 지원할까 기대했는데 그건 되지 않는다.
+        <ul>
+          <li>이거야 shell 에서 하면 되니까.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>다른 HDD 파티션에 kubuntu 16.04.1 를 설치했다.
+    <ul>
+      <li>USB로 부팅.
+        <ul>
+          <li><code class="highlighter-rouge">sudo dd if=./kubuntu-16.04.1-desktop-amd64.iso of=/dev/sdb</code></li>
+        </ul>
+      </li>
+      <li>GRUB: <a href="http://sangwook.github.io/images/2016/161011-ubuntu16-grub.jpg"><img src="http://sangwook.github.io/images/2016/161011-ubuntu16-grub.jpg" alt="GRUB" /></a></li>
+      <li>start kubuntu &gt; install kubuntu 로 설치 진행.</li>
+      <li>네트워크 잡고.</li>
+      <li>git, curl, tmux, zsh, vim, dropbox, fcitx 설치.</li>
+      <li>system ruby, python, nodejs 를 사용하지 않도록.
+        <ul>
+          <li>rvm, pyenv, nvm 을 설치했다.</li>
+          <li>system ruby, python 을 사용하지 않도록 <code class="highlighter-rouge">/usr/bin/python*</code> 을 rename 했는데.
+            <ul>
+              <li>이렇게하면 terminator 가 실행하면서 오류가 발생해서 되돌렸다.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>wine, kakaotalk 설치.</li>
+      <li>여기까지 설치하는게 내 필수 환경이라고 생각한다.</li>
+    </ul>
+  </li>
+  <li>Ubuntu14 를 메인으로 계속 사용하면서 하루에 10-30분씩 Kubuntu16으로 부팅하여 문제/해결을 했다.
+    <ul>
+      <li>3개월정도의 트러블슈팅 끝에 마침내 Kubuntu16 을 메인으로 사용하기 시작했다.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="ubuntu14-unity-에서---ubuntu16-kde-로-넘어오면서-생긴-문제해결">Ubuntu14 Unity 에서 -&gt; Ubuntu16 KDE 로 넘어오면서 생긴 문제/해결</h3>
+
+<ul>
+  <li>[문제] 부팅했을 때 fcitx가 자동실행되지 않음.
+    <ul>
+      <li>[해결] <code class="highlighter-rouge">~/.config/autostart/fcitx-autostart.desktop</code> 파일을 만들었음.</li>
+    </ul>
+  </li>
+  <li>[문제] <code class="highlighter-rouge">zshrc</code> 안에서 DE가 KDE 인지 여부에 따라 분기하는 로직이 필요하다.
+    <ul>
+      <li>[해결] <code class="highlighter-rouge">$DESKTOP_SESSION</code> 을 쓸까 고민하다가, <code class="highlighter-rouge">$XDG_CURRENT_DESKTOP</code>을 사용함.</li>
+    </ul>
+  </li>
+  <li>[문제] KDE가 <code class="highlighter-rouge">~/.xprofile</code> 을 읽지 않는다.
+    <ul>
+      <li>[해결] <code class="highlighter-rouge">/etc/X11/Xsession.d/</code> 아래에 파일을 생성함.</li>
+    </ul>
+  </li>
+  <li>[문제] 나눔고딕코딩 글꼴 설치가 안 된다.
+    <ul>
+      <li>공식 사이트의 설치 가이드 <a href='#fn:7' class='footnote' id='fnref:7'>[7]</a> 처럼 하면 오류가 난다.</li>
+      <li>[해결] 패키지 설치.
+        <ul>
+          <li><code class="highlighter-rouge">sudo apt install fonts-nanum fonts-nanum-extra fonts-nanum-coding fonts-baekmuk fonts-unfonts-core fonts-unfonts-extra</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>[문제] KDE 기본 터미널인 konsole 에서 NanumGothicCoding 폰트를 선택할 수 없다.
+    <ul>
+      <li>[해결] <code class="highlighter-rouge">konsole</code> 대신 다른 터미널을 쓰기로 함.
+        <ul>
+          <li>처음에는 top-down terminal 을 써보다가.
+            <ul>
+              <li>top-down terminal: 게임 Quake의 채팅창 처럼 F12를 누르면 위에서 터미널이 (언제나) 내려오는 스타일</li>
+              <li>e.g. Guake, Yakuake, Tilda</li>
+            </ul>
+          </li>
+          <li>여기서도 설정 문제가 있어서. <code class="highlighter-rouge">terminator</code> 에 적응했다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>[문제] app launcher 를 meta 키 하나로 실행하고 싶다.
+    <ul>
+      <li>[해결?] KDE config 전체적으로 mod 키 만으로는 shortcut 을 지정할 수 없다.
+        <ul>
+          <li>할 수 없이 meta+z 로 shortcut을 지정했다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>[문제] 특정 키를 누르면 -&gt; 특정 앱이 실행 되거나 focus가 되는 shortcut을 지정하고 싶다.
+    <ul>
+      <li>[해결] KDE는 command를 global shortcut으로 지정할 수 있고.
+        <ul>
+          <li>아래와 같이 focus 하거나 실행할 수 있다.
+            <ul>
+              <li><code class="highlighter-rouge">wmctrl -xa terminator.Terminator || terminator</code></li>
+            </ul>
+          </li>
+          <li><a href="http://sangwook.github.io/images/2016/161011-ubuntu16-shortcut-wmctrl.jpg"><img src="http://sangwook.github.io/images/2016/161011-ubuntu16-shortcut-wmctrl.jpg" alt="shortcut" /></a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>[문제] <code class="highlighter-rouge">R_ALT</code> 를 한/영 키로 설정했는데, 빠르게 한영전환이 안 됨.
+    <ul>
+      <li>[해결?] right alt 만 전체적으로 disable 하고 싶은데.
+        <ul>
+          <li>불가능한 것 같다.</li>
+          <li>사용하지 않는 ALT로 조합되는 shortcut 을 보이는데로 제거했다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>[문제] proxy 설정을 shell 에서 하고 싶다.
+    <ul>
+      <li>Ubuntu14 Unity 에서는 <code class="highlighter-rouge">gsettings</code> 명령으로 설정했었다.</li>
+      <li>[해결] KDE에서는 아래의 파일과 명령으로 가능한 것 같은데. 필요할 때 적용하는 걸로…
+        <ul>
+          <li><code class="highlighter-rouge">~/.kde/share/config/kioslaverc</code></li>
+          <li><code class="highlighter-rouge">kreadconfig --file kioslaverc --group "Proxy Settings" --key httpproxy</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>[문제] vim을 소스에서 직접 빌드가 제대로 안 됨.
+    <ul>
+      <li><code class="highlighter-rouge">--enable-gui=auto</code> 옵션으로 빌드하면.</li>
+      <li><code class="highlighter-rouge">checking --enable-gui argument... no GUI support</code> 이런 에러가 남.</li>
+      <li>[해결] <code class="highlighter-rouge">/etc/apt/sources.list</code> 가 디폴트로 <code class="highlighter-rouge">deb</code>만 활성화 되어 있는데 <code class="highlighter-rouge">deb-src</code> 를 주석 해제하고 <code class="highlighter-rouge">build-dep</code>을 하면 된다.</li>
+      <li><a href="http://sangwook.github.io/images/2016/161011-ubuntu16-vim-version.jpg"><img src="http://sangwook.github.io/images/2016/161011-ubuntu16-vim-version.jpg" alt="vim8" /></a></li>
+    </ul>
+  </li>
+  <li>[문제] headphone으로 음악을 듣다가, headphone을 뽑으면 speaker를 음소거 상태로 만들고 싶다.
+    <ul>
+      <li>Ubuntu14 Unity 에서는 자동으로 headphone, speaker 별로 내가 조정한 소리 크기를 기억했다.</li>
+      <li>그래서 자동으로 내가 원하는대로 동작했다.</li>
+      <li>KDE는 내 선택을 기억하지 않았고. 해결책을 시간 있을 때 찾아봐야겠다.</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="http://pollmill.com/f/which-tiling-window-manager-do-you-use-dax6md8/answers">http://pollmill.com/f/which-tiling-window-manager-do-you-use-dax6md8/answers</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="https://www.reddit.com/r/archlinux/comments/2t7cek/poll_which_tiling_window_manager_do_you_use/">https://www.reddit.com/r/archlinux/comments/2t7cek/poll_which_tiling_window_manager_do_you_use/</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="https://www.slant.co/topics/390/~window-managers-for-linux">https://www.slant.co/topics/390/~window-managers-for-linux</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:4" id="fn:4" class="reversefootnote">[4]</a>:
+    </span>
+    <span class="content"><a href="https://www.reddit.com/r/linux/comments/4ftq8e/ubuntu_1604_lts_has_been_officially_released/">https://www.reddit.com/r/linux/comments/4ftq8e/ubuntu_1604_lts_has_been_officially_released/</a> <a href="#fnref:4" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:5" id="fn:5" class="reversefootnote">[5]</a>:
+    </span>
+    <span class="content"><a href="https://www.reddit.com/r/Ubuntu/comments/4ftqs0/ubuntu_1604_lts_has_been_released/">https://www.reddit.com/r/Ubuntu/comments/4ftqs0/ubuntu_1604_lts_has_been_released/</a> <a href="#fnref:5" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:6" id="fn:6" class="reversefootnote">[6]</a>:
+    </span>
+    <span class="content"><a href="https://www.reddit.com/r/linux/comments/4txzoa/ubuntu_16041_lts_released/">https://www.reddit.com/r/linux/comments/4txzoa/ubuntu_16041_lts_released/</a> <a href="#fnref:6" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:7" id="fn:7" class="reversefootnote">[7]</a>:
+    </span>
+    <span class="content"><a href="http://dev.naver.com/projects/nanumfont/wiki/Install">http://dev.naver.com/projects/nanumfont/wiki/Install</a> <a href="#fnref:7" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Dropbox 갤러리앱 성능 개선" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="Building Carousel, Part I: How we made our networked mobile app feel fast and local Dropbox가 얼마전에 사진관리 앱 Carousel을 런칭했는데. 기본 갤러리앱 만큼 속도를 빠르게 느끼도록 만들기위해 노력한 내..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Dropbox 갤러리앱 성능 개선"/>
+  <meta name="og:description"  content="Building Carousel, Part I: How we made our networked mobile app feel fast and local Dropbox가 얼마전에 사진관리 앱 Carousel을 런칭했는데. 기본 갤러리앱 만큼 속도를 빠르게 느끼도록 만들기위해 노력한 내..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/04/16/dropbox-carousel-fast-sqlite-cache.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Dropbox 갤러리앱 성능 개선"/>
+  <meta name="twitter:description" content="Building Carousel, Part I: How we made our networked mobile app feel fast and local Dropbox가 얼마전에 사진관리 앱 Carousel을 런칭했는데. 기본 갤러리앱 만큼 속도를 빠르게 느끼도록 만들기위해 노력한 내..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Dropbox 갤러리앱 성능 개선</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Dropbox 갤러리앱 성능 개선</h1>
+    <p class="post-meta"><time datetime="2014-04-16T15:05:00+09:00" itemprop="datePublished">2014-04-16</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="https://blogs.dropbox.com/tech/2014/04/building-carousel-part-i-how-we-made-our-networked-mobile-app-feel-fast-and-local/">Building Carousel, Part I: How we made our networked mobile app feel fast and local</a></p>
+
+<ul>
+  <li>Dropbox가 얼마전에 사진관리 앱 Carousel을 런칭했는데.</li>
+  <li>기본 갤러리앱 만큼 속도를 빠르게 느끼도록 만들기위해 노력한 내용을 테크 블로그에 소개했다.</li>
+  <li>평소에 모바일앱은 모든 리모트 리소스에 대해 앱에서 캐시를 해야 한다고 생각하고 있었는데 이 포스트에서 상세히 어떻게 구현을 하는지 나와있다.</li>
+</ul>
+
+<h3 id="해결하려는-문제-make-it-faster">해결하려는 문제 (Make it Faster!)</h3>
+
+<ul>
+  <li>사진을 공유하거나, 사진을 삭제할때 마다
+    <ul>
+      <li>서버와의 동기화를 위해 HTTPS 요청 대기상태가 된다.</li>
+      <li>네트워크 상태가 안 좋으면 요청은 실패하고 재시도 하겠냐고 물어본다.</li>
+    </ul>
+  </li>
+  <li>디바이스에만 존재하는 사진(Dropbox에 아직 업로드 안 한)을 보거나 interaction 할 방법이 없다.</li>
+</ul>
+
+<h3 id="client-architecture-클라이언트모바일앱-측-아키텍처">Client Architecture (클라이언트(모바일앱) 측 아키텍처)</h3>
+
+<ul>
+  <li>로컬 사진, 리모트 사진 모두를 고려한 통합 데이터 모델을 만들었다.</li>
+  <li>사용자는 100ms 안에 응답을 받을 수 있도록 하고,</li>
+  <li>네트워크 요청에 대한 대기상태를 사용자가 느끼지 않도록 만들었다.</li>
+  <li>즉, eventually consistent system 을 만들었다.
+    <ul>
+      <li>사용자가 액션을 하면</li>
+      <li>즉시 locally 하게 처리해서 사용자에게 보여주고</li>
+      <li>나중에 globally 하게 다른 디바이스에 적용한다.</li>
+      <li>이것을 학계에서는 <a href="http://en.wikipedia.org/wiki/Optimistic_replication">낙관적 복제</a> “optimistic replication” 라고 부른다.</li>
+    </ul>
+  </li>
+  <li>로컬과 서버 컨텐츠를 병합한 뷰를 만들기 위해, 클라이언트가 원격 서버의 변화를 알고 최신상태를 유지하는게 필요하다.
+    <ul>
+      <li>그래서 우리는 HTTP Long polling 을 사용해서 변경사항이 있다는 사실을 노티 받고, Dropbox Delta API를 사용해서 변경 데이터를 pull하는 구조로 만들었다.</li>
+      <li>Delta는 이전 서버 호출 이후의 변경사항을 리턴한다.</li>
+      <li>변경사항을 fetch 하면 가장 최신상태의 서버 메타데이터를 SQLite 의 server_photos 테이블에 넣는다.</li>
+      <li>server_photos 테이블은 순수하게 서버에 대한 캐시다.</li>
+    </ul>
+  </li>
+  <li>클라이언트 측 카메라 롤 스캐너는 빠르게 각 사진의 해시값을 계산하고,
+    <ul>
+      <li>Dropbox에 아직 안 올린 사진인지를 판별한다.</li>
+      <li>업로드가 필요한 사진은 SQLite의 photo_upload_operation 테이블에 들어간다.</li>
+      <li>유저가 사진을 숨기기 또는 삭제를 하면, 즉시 액션을 반영한다.</li>
+      <li>우리는 이런 변경사항을 비동기적으로 서버에 write 할 수 있다.</li>
+      <li>이렇게 하기 위해, 우리는 HideOperation, DeleteOperation을 만들었고 SQLite로 persisted 된다.</li>
+    </ul>
+  </li>
+  <li>Carousel의 모든 유저 액션은 결국엔 서버로 동기화된다.
+    <ul>
+      <li>이 작업들은 in-memory operation queues 에 들어가고, SQLite 에 persisted 된다.</li>
+      <li>각 queue 마다 별도의 독점적 스레드(dedicated operation sync thread)가 있고,
+        <ul>
+          <li>실행할 준비가 될때까지 대기하다가 HTTPS call 을 만들고 서버에 변경사항을 보낸다.</li>
+        </ul>
+      </li>
+      <li>유저에게 view를 그릴 필요가 있을때마다,
+        <ul>
+          <li>이러한 보류 작업(pending operations)들을 확인하고 유저의 최신 액션이 반영되어 있는지 확인한다.
+            <ul>
+              <li>(view에 최신 액션이 반영되어 있지 않으면 view를 렌더링할때 반영시키는 구조 인 듯 함.)</li>
+            </ul>
+          </li>
+          <li>이러한 operation 을 안전하게 삭제하는 유일한 방법은. delta API로 서버에 반영된 것을 확인했을 때이다.</li>
+        </ul>
+      </li>
+      <li>그림으로 설명하면 이렇다: <a href="https://lh4.googleusercontent.com/DuBT6U5UtmDD_lJLEyYz9a4WGwDHo4LcjDlXA8Xo5jU8bt0-AkuCS18Vsh5JZxmNvVJ71eMrjB9CbQPqex-N7QspdzuQNuwGomoVRMi68VqPmGETcCojiCggs5NUoMji8g"><img src="https://lh4.googleusercontent.com/DuBT6U5UtmDD_lJLEyYz9a4WGwDHo4LcjDlXA8Xo5jU8bt0-AkuCS18Vsh5JZxmNvVJ71eMrjB9CbQPqex-N7QspdzuQNuwGomoVRMi68VqPmGETcCojiCggs5NUoMji8g" alt="We thus end up with an architecture that looks like this" /></a></li>
+    </ul>
+  </li>
+</ul>
+
+<p>예를 들어 primary grid view를 렌더링 하는 코드는 아래와 같다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class DbxPhotoClient {
+    list list_photos();
+};
+</code></pre>
+</div>
+
+<p>list_photos() 함수의 구현은 아래의 순서로 처리된다.</p>
+
+<ul>
+  <li>server_photos 테이블에서 서버의 모든 사진 메타데이터를 읽는다.</li>
+  <li>photo_upload_operations 테이블에서 업로드 보류중인 로컬 사진들을 가져와서 모두 추가한다.</li>
+  <li>photo_modification_operations 테이블에서 숨김, 삭제된 사진을 모두 가져와서 제거한다.</li>
+</ul>
+
+<p>위의 예제를 보면</p>
+
+<ul>
+  <li>photo model 이 변경될때마다 SQLite 처리를 하는데 많은 비용이 든다.
+    <ul>
+      <li>그래서 그대신에 photo model 을 메모리에 유지하고, 변경사항을 받아 수정하도록 만들었다. (앱 내 변화든, 서버의 변화든 모두)</li>
+      <li>이것은 서버에서 변경사항을 동기화하는 delta API와 구조가 다르지 않다.</li>
+      <li>성능을 위해 디스크와 메모리 사이에 다른 delta 레벨을 도입했다고 생각하면 된다.</li>
+      <li>다음에 쓸 블로그 포스트에 이게 어떻게 동작하는지, 그리고 10만개 이상의 사진을 어떻게 처리하는지에 대해 쓰겠다.</li>
+    </ul>
+  </li>
+  <li>핵심은. 클라이언트에서 사진 추가, 삭제하는 것과 서버에서 사진 업로드, 삭제하는 것이 동일한 결과라는 것.
+    <ul>
+      <li>Carousel에서 데이터를 렌더링 할때마다
+        <ul>
+          <li>캐시된 서버 상태를 보고,</li>
+          <li>보류된 오퍼레이션을 replay 한다.</li>
+          <li>숨김/삭제의 케이스는 last-write-win (최근 기록 우선 규칙) 으로 충돌을 해결한다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>이러한 처리방식은 사진이 Dropbox 서버에 있고 서버에서 ID를 부여 받았을때는 아주 잘 작동한다.
+    <ul>
+      <li>로컬에서 보류중인 오퍼레이션은 서버에 적용될때만 서버ID를 부여 받을 수 있는데.</li>
+      <li>업로드가 아직 안 된 사진에 대한 변경에 일어나면 어떻게 해야 할까?</li>
+      <li>이건 다음 챕터에서 설명한다.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="identifying-a-photo-사진-식별하기">Identifying a Photo (사진 식별하기)</h3>
+
+<ul>
+  <li>로컬에만 존재하는 사진을 서버와 제대로 동기화 하려면 여러가지 방법들이 있다.</li>
+  <li>(상대적으로) stateless하고 심플하게 클라이언트 로직을 이해할 수 있는 구조를 만들기 위해 device-specific ID 컨셉을 만들었다.</li>
+  <li>이걸 앞으론 LUID (locally unique ID) 라고 부르겠다.</li>
+  <li>LUID는 사진을 Dropbox에 업로드를 하기 이전이든 이후든 ID가 변하지 않는다.</li>
+  <li>LUID는 단순하게 autoincrement integer 값이다.</li>
+  <li>이렇게 동작한다:
+    <ul>
+      <li>Dropbox 에 업로드 해야하는 새로운 사진을 디바이스에서 찾고.</li>
+      <li>사진에 LUID를 생성한다.</li>
+      <li>LUID는 local_photo_luids 테이블에 추가되고
+        <ul>
+          <li>LUID는 네이티브 카메라 롤 ID에 매핑된다.</li>
+        </ul>
+      </li>
+      <li>만약 delta에서 서버로부터의 새로운 사진 S 를 얻으면.
+        <ul>
+          <li>로컬에 있는 사진들의 hash와 일치하는지 확인하고 없으면 LUID를 생성한다.
+            <ul>
+              <li>그리고 server_photo_luids 테이블에 추가하고 LUID는 서버ID 와 매핑된다.</li>
+            </ul>
+          </li>
+          <li>만약 hash가 로컬의 사진 L 과 일치하면 이미 업로드된 사진이라는 의미이고 서버 메타 데이터를 사용할 수 있다.
+            <ul>
+              <li>S.photo_luid = L.photo_luid 이렇게 assign 한다.</li>
+              <li>동시에 photo_upload_operation 작업을 완료한다.</li>
+              <li>충돌을 피하기 위해, 같은 해시의 첫번째 서버측 사진이 LUID를 받게 된다.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>이 로직을 사용하면 서버에 있든 없든 걱정없이 안정적으로 사진에 대한 작업을 수행할 수 있다.
+        <ul>
+          <li>클라이언트는 심플하게 LUID만 보면 된다.</li>
+          <li>로컬에 있는 사진을 Dropbox에 업로드가 완료되는 시점에 새로운 서버ID를 참조하도록 “upgrading”되는 구조다.</li>
+          <li>LUID는 그것을 추상화한다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="faster-sharing-빠르게-공유하기">Faster Sharing (빠르게 공유하기)</h3>
+
+<ul>
+  <li>Carousel 에서 유저가 사진을 공유할때 일어나는 일들을 살펴보자.</li>
+  <li>유저가 여러 사진을 선택한다.</li>
+  <li>로컬에만 있는 사진과 서버에 업로드된 사진을 모두 포함해서 선택했다.</li>
+  <li>사진을 선택하고 있는 도중에 서버에 업로드가 완료된 경우에도 상관없다.
+    <ul>
+      <li>사진은 LUID기반이니까.</li>
+    </ul>
+  </li>
+  <li>유저가 공유할 수신자(recipients)들을 선택하면
+    <ul>
+      <li>share operation을 SQLite에 저장하고.</li>
+      <li>view를 렌더링 할때 수신자들의 대화 식별값을 위한 상태를 캐시서버로 부터 가져온다.</li>
+      <li>그리고 지금까지의 렌더링과 동일한 방식으로 보류 상태의 공유 작업들을 re-play 한다.
+        <ul>
+          <li>이것도 새로운 블로그 포스트에 써야할 정도로 내용이 많다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>만약 share operation 내에 여전히 로컬에만 있는 LUID들이 존재하면 (server_photo_luids 테이블에 없는 것)
+    <ul>
+      <li>share operation 은 서버에 아직 보낼 수 없다.</li>
+      <li>share operation 의 큐는 sleep 상태가 되고.</li>
+      <li>로컬에만 존재하는 사진이 Dropbox 서버에 모두 업로드될때까지 기다린다.</li>
+      <li>또한 photo_upload_operation 테이블에 “blocking a share” 로 표시한다.</li>
+      <li>그래서 업로드 큐에서 표시한 작업이 우선 처리 하도록 만든다.</li>
+    </ul>
+  </li>
+  <li>사진이 모두 업로드 되면 share operation 은 서버에서 실행된다.
+    <ul>
+      <li>server_photo_luids 룩업 테이블에서 서버ID를 확인하고 서버에 요청을 보낸다.</li>
+    </ul>
+  </li>
+  <li>best part는 이 모든 작업이 비동기적이라는 것이다.
+    <ul>
+      <li>그래서 유저는 앱을 계속 사용하는데 방해받지 않는다.</li>
+      <li>스피너도 안 보이고, 대기하는 것도 없다. (No spinners, no waiting.)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="lessons-learned-교훈">Lessons Learned (교훈)</h3>
+
+<ul>
+  <li>가장 큰 교훈은 사용자를 방해하지 말라는 것이다. (don’t block the user)</li>
+  <li>우리는 변경사항을 순차적으로 서버에 동기화하는 대신에 eventually consistent system 을 만들었다.</li>
+  <li>모바일 네트워크는 여전히 느리고 신뢰할 수 없다.</li>
+  <li>비동기 delta 기반 디자인은 클라이언트와 서버 사이의 latency 를 사용자가 느끼지 못하게 한다.</li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

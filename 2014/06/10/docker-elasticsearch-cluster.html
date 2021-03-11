@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Docker 로 Elasticsearch 클러스터 구성하기" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="각각 VM을 직접 만드는 형태 (예전 방식) 기존에 내가 하던 방식은, 아래와 같이 elasticsearch 게스트OS 를 각각 VM을 만들어 띄웠다. 단점은. 하드웨어 VM이라 무겁다. Vagrant.configure(VAGRANTFILE_API_VERSION) do |confi..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Docker 로 Elasticsearch 클러스터 구성하기"/>
+  <meta name="og:description"  content="각각 VM을 직접 만드는 형태 (예전 방식) 기존에 내가 하던 방식은, 아래와 같이 elasticsearch 게스트OS 를 각각 VM을 만들어 띄웠다. 단점은. 하드웨어 VM이라 무겁다. Vagrant.configure(VAGRANTFILE_API_VERSION) do |confi..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/06/10/docker-elasticsearch-cluster.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Docker 로 Elasticsearch 클러스터 구성하기"/>
+  <meta name="twitter:description" content="각각 VM을 직접 만드는 형태 (예전 방식) 기존에 내가 하던 방식은, 아래와 같이 elasticsearch 게스트OS 를 각각 VM을 만들어 띄웠다. 단점은. 하드웨어 VM이라 무겁다. Vagrant.configure(VAGRANTFILE_API_VERSION) do |confi..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Docker 로 Elasticsearch 클러스터 구성하기</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Docker 로 Elasticsearch 클러스터 구성하기</h1>
+    <p class="post-meta"><time datetime="2014-06-10T17:57:00+09:00" itemprop="datePublished">2014-06-10</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="각각-vm을-직접-만드는-형태-예전-방식">각각 VM을 직접 만드는 형태 (예전 방식)</h3>
+
+<p>기존에 내가 하던 방식은, 아래와 같이 elasticsearch 게스트OS 를 각각 VM을 만들어 띄웠다. 단점은. 하드웨어 VM이라 무겁다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.define :main, primary: true do |main|
+        main.vm.box = "precise64"
+        main.vm.hostname = "main"
+        main.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    end
+
+    config.vm.define :es1, primary: false do |main|
+        main.vm.box = "precise64"
+        main.vm.box_url = "http://files.vagrantup.com/precise64.box"
+        main.vm.hostname = "es1"
+        main.vm.provision :shell, :path =&gt; "vagrant-provision-elasticsearch.sh"
+    end
+
+    config.vm.define :es2, primary: false do |main|
+        main.vm.box = "precise64"
+        main.vm.box_url = "http://files.vagrantup.com/precise64.box"
+        main.vm.hostname = "es2"
+        main.vm.provision :shell, :path =&gt; "vagrant-provision-elasticsearch.sh"
+    end
+end
+</code></pre>
+</div>
+
+<h3 id="docker-컨테이너를-올리는-방식으로-전환">Docker 컨테이너를 올리는 방식으로 전환</h3>
+
+<p>우선 docker 이미지 중에 elasticsearch 이미지가 있는지 찾는다</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>vagrant@main:~$ docker search elasticsearch
+NAME DESCRIPTION STARS OFFICIAL AUTOMATED
+dockerfile/elasticsearch Trusted ElasticSearch (http://www.elastics... 37 [OK]
+pblittle/docker-logstash Logstash (1.3.3) flat jar image. Configure... 5 [OK]
+barnybug/elasticsearch Latest Elasticsearch 1.2.1 and all previou... 2 [OK]
+...
+</code></pre>
+</div>
+
+<p>docker 로 elasticsearch 를 클러스터 구성을 한 번 테스트 해본다. (<a href="https://github.com/dockerfile/elasticsearch/blob/master/Dockerfile">사실 dockerfile/elasticsearch 가 해주는건 별로 없다. 자바 설치하고 elasticsearch를 설치할 뿐이다.</a>)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>vagrant@main:~$ docker run -d --name es1 -v /work/dotfiles/docker-data-es1:/data -p 9201:9200 -p 9301:9300 dockerfile/elasticsearch
+758232a67d81c32067baa010c6a29a4ac77fa9167bf326712114ab962f414bcf
+vagrant@main:~$ docker run -d --name es2 -v /work/dotfiles/docker-data-es2:/data -p 9202:9200 -p 9302:9300 dockerfile/elasticsearch
+16ca988a94a3cbbd8c306302f1ad134e16dcb7fb4633732df08462dc1436741d
+vagrant@main:~$ docker ps
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+16ca988a94a3 dockerfile/elasticsearch:latest /elasticsearch/bin/e 3 seconds ago Up 3 seconds 0.0.0.0:9202-&gt;9200/tcp, 0.0.0.0:9302-&gt;9300/tcp es2
+758232a67d81 dockerfile/elasticsearch:latest /elasticsearch/bin/e 6 seconds ago Up 5 seconds 0.0.0.0:9201-&gt;9200/tcp, 0.0.0.0:9301-&gt;9300/tcp es1
+
+vagrant@main:~$ curl localhost:9201
+{
+  "status" : 200,
+  "name" : "Orbit",
+  "version" : {
+    "number" : "1.2.1",
+    "build_hash" : "6c95b759f9e7ef0f8e17f77d850da43ce8a4b364",
+    "build_timestamp" : "2014-06-03T15:02:52Z",
+    "build_snapshot" : false,
+    "lucene_version" : "4.8"
+  },
+  "tagline" : "You Know, for Search"
+}
+vagrant@main:~$ curl localhost:9202
+{
+  "status" : 200,
+  "name" : "Taskmaster",
+  "version" : {
+    "number" : "1.2.1",
+    "build_hash" : "6c95b759f9e7ef0f8e17f77d850da43ce8a4b364",
+    "build_timestamp" : "2014-06-03T15:02:52Z",
+    "build_snapshot" : false,
+    "lucene_version" : "4.8"
+  },
+  "tagline" : "You Know, for Search"
+}
+</code></pre>
+</div>
+
+<p>docker provision 을 이용해서 추가하도록 Vagrantfile 을 수정한다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>main.vm.provision "docker" do |d|
+    data_dir = "/work/dotfiles/docker-data-es1"
+    d.run "es1",
+        image: "dockerfile/elasticsearch",
+        args: "--name es1 -v #{data_dir}:/data -p 9201:9200 -p 9301:9300"
+
+    data_dir = "/work/dotfiles/docker-data-es2"
+    d.run "es2",
+        image: "dockerfile/elasticsearch",
+        args: "--name es2 -v #{data_dir}:/data -p 9202:9200 -p 9302:9300"
+end
+</code></pre>
+</div>
+
+<p>잘 작동하는지 확인한다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>vagrant@main:~$ curl localhost:9201/_cat/health?v
+epoch timestamp cluster status node.total node.data shards pri relo init unassign
+1402390226 08:50:26 sangwookescluster green 2 2 0 0 0 0 0
+</code></pre>
+</div>
+
+<ul>
+  <li>덧1, 점심 먹고 같은 팀의 안건님께 Docker에 대한 설명을 들은게 큰 도움이 되었다.</li>
+  <li>덧2, 위 방식이 올바른 건지 모르겠다.</li>
+  <li>덧3, 참고로 위의 예제에서 <code class="highlighter-rouge">/work/dotfiles/docker-data-es1/elasticsearch.yml</code> 이렇게 설정파일이 위치한다.</li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

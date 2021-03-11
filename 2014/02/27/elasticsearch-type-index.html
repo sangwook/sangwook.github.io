@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="각각의 index에 각각의 type을 저장: 인덱스 내에서 검색이 효과적이고 빠르다. 데이터량은 각 샤드 내에서 작아야 한다. 2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있다. 왜냐하면 쿼리는 각 인덱스들의 샤드들로 보내지고, 다시 결과를 합쳐서 유저에게 보내..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type"/>
+  <meta name="og:description"  content="각각의 index에 각각의 type을 저장: 인덱스 내에서 검색이 효과적이고 빠르다. 데이터량은 각 샤드 내에서 작아야 한다. 2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있다. 왜냐하면 쿼리는 각 인덱스들의 샤드들로 보내지고, 다시 결과를 합쳐서 유저에게 보내..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/02/27/elasticsearch-type-index.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type"/>
+  <meta name="twitter:description" content="각각의 index에 각각의 type을 저장: 인덱스 내에서 검색이 효과적이고 빠르다. 데이터량은 각 샤드 내에서 작아야 한다. 2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있다. 왜냐하면 쿼리는 각 인덱스들의 샤드들로 보내지고, 다시 결과를 합쳐서 유저에게 보내..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type</h1>
+    <p class="post-meta"><time datetime="2014-02-27T10:31:00+09:00" itemprop="datePublished">2014-02-27</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="각각의-index에-각각의-type을-저장">각각의 index에 각각의 type을 저장:</h3>
+
+<ul>
+  <li>인덱스 내에서 검색이 효과적이고 빠르다. 데이터량은 각 샤드 내에서 작아야 한다.</li>
+  <li>2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있다.
+    <ul>
+      <li>왜냐하면 쿼리는 각 인덱스들의 샤드들로 보내지고, 다시 결과를 합쳐서 유저에게 보내야 하기 때문이다.</li>
+    </ul>
+  </li>
+  <li>만약 데이터셋이 작다면 비추다.
+    <ul>
+      <li>왜냐하면 미미한 성능향상을 위해 추가적인 샤드, 더 많은 스토리지가 필요하게 된다.</li>
+    </ul>
+  </li>
+  <li>만약 데이터셋이 크고 쿼리가 오래 걸린다면 추천한다.
+    <ul>
+      <li>왜나하면 독점적인 샤드는 specific 데이터들을 저장하고, 그것은 ES가 처리하기 쉽게 만들기 때문이다.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="1개의-index에-여러-type으로-저장">1개의 index에 여러 type으로 저장:</h3>
+
+<ul>
+  <li>1개의 인덱스 안에 있는 5개의 샤드(디폴트)에 더 많은 데이터가 저장된다.
+    <ul>
+      <li>이것은 다른 type 을 조합하는 쿼리를 날릴때 오버헤드가 적다는 것을 의미한다.</li>
+      <li>하지만 샤드 크기가 상당히 커질 거다.</li>
+    </ul>
+  </li>
+  <li>샤드가 커진다는 것은 ES가 검색하는 데 더 오래걸린 다는 의미다. 왜냐하면 필터를 해야하는 문서가 더 많이 있기 때문이다.</li>
+  <li>만약 1TB 데이터로 성장할거라면 비추다.</li>
+  <li>다른 인덱스 또는 여러 샤드에 데이터를 분산하지 않을거면 비추다.</li>
+  <li>데이터가 작다면 추천. 왜냐하면 미미한 성능향상을 위해 스토리지를 낭비하지 않을거니까.</li>
+</ul>
+
+<p><a href="http://stackoverflow.com/questions/14465668/elastic-search-multiple-indexes-vs-one-index-and-types-for-different-data-sets">http://stackoverflow.com/questions/14465668/elastic-search-multiple-indexes-vs-one-index-and-types-for-different-data-sets</a></p>
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

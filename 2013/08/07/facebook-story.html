@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Facebook의 새로운 뉴스피드 알고리즘 &quot;Story Bumping&quot;" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="문제 최근까지 뉴스 피드는 사용자가 이전에 로그인 한 이후의 모든 게시물을 평가하여 가장 관심이 갈 게시물을 표시하고 있었다. 하지만 사용자는 항상 페이지를 보고있는 것은 아니기 때문에 몇 시간 후에는 더 새로운 기사가 수북히 쌓여 결국 읽지 않은 기사는 영원히 접할 기회가 없어져..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Facebook의 새로운 뉴스피드 알고리즘 &quot;Story Bumping&quot;"/>
+  <meta name="og:description"  content="문제 최근까지 뉴스 피드는 사용자가 이전에 로그인 한 이후의 모든 게시물을 평가하여 가장 관심이 갈 게시물을 표시하고 있었다. 하지만 사용자는 항상 페이지를 보고있는 것은 아니기 때문에 몇 시간 후에는 더 새로운 기사가 수북히 쌓여 결국 읽지 않은 기사는 영원히 접할 기회가 없어져..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2013/08/07/facebook-story.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Facebook의 새로운 뉴스피드 알고리즘 &quot;Story Bumping&quot;"/>
+  <meta name="twitter:description" content="문제 최근까지 뉴스 피드는 사용자가 이전에 로그인 한 이후의 모든 게시물을 평가하여 가장 관심이 갈 게시물을 표시하고 있었다. 하지만 사용자는 항상 페이지를 보고있는 것은 아니기 때문에 몇 시간 후에는 더 새로운 기사가 수북히 쌓여 결국 읽지 않은 기사는 영원히 접할 기회가 없어져..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Facebook의 새로운 뉴스피드 알고리즘 &quot;Story Bumping&quot;</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Facebook의 새로운 뉴스피드 알고리즘 &quot;Story Bumping&quot;</h1>
+    <p class="post-meta"><time datetime="2013-08-07T13:08:00+09:00" itemprop="datePublished">2013-08-07</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>문제</p>
+
+<ul>
+  <li>최근까지 뉴스 피드는 사용자가 이전에 로그인 한 이후의 모든 게시물을 평가하여</li>
+  <li>가장 관심이 갈 게시물을 표시하고 있었다.</li>
+  <li>하지만 사용자는 항상 페이지를 보고있는 것은 아니기 때문에</li>
+  <li>몇 시간 후에는 더 새로운 기사가 수북히 쌓여</li>
+  <li>결국 읽지 않은 기사는 영원히 접할 기회가 없어져 버린다.</li>
+</ul>
+
+<p>해결</p>
+
+<ul>
+  <li>그래서 Story Bumping 알고리즘이 등장했다.</li>
+  <li>Facebook은 단순히 최종 사용자가 확인한 후에 게시 된 기사만을 평가하는 것이 아니라,</li>
+  <li>최근 읽지 않은 기사도 평가 대상에 추가했다.</li>
+  <li>그래서 좀더 관심있는 기사를 볼 수 있게 되었다. (조금 오래되었더라도.)</li>
+</ul>
+
+<p>평가</p>
+
+<ul>
+  <li>Facebook은 이미 웹 버전에서는 Story Bumping을 운용 중</li>
+  <li>테스트 결과 Story Bumping은 좋아요, 공유 수를 5% 증가시켰다.</li>
+  <li>또한 기업이나 개인 페이지에 대한 반응을 8% 증가시켰다.</li>
+  <li>또한 “사용자가 관심을 가질 가능성이있는 기사” 를 57%에서 70% 로 크게 증가시켰다.</li>
+</ul>
+
+<blockquote>
+  <p>700 million people use the Facebook News Feed every day but many don’t understand how it decides what appears, so Facebook announced today it will start on how the feed algorithm is changing similar to how Google does. So Facebook will soon start to show these rapid real-time updates in chronological order so you see the most recent update first and the oldest one last. Facebook’s first post will be about “Story Bumping”, which pushes stories you haven’t seen above ones you have.</p>
+</blockquote>
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

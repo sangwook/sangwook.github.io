@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Google Cloud Dataflow 발표 (Google I/O 2014)" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="Google의 VP인 Urs Hölzle 의 키노트 Urs Hölzle: 구글의 8번째 직원이고, 최초의 기술자 출신 VP. 이미 1년 전부터 MapReduce 를 사용하고 있지 않다. Google 이 만들고, 오픈소스 Hadoop 으로 많은 곳에서 쓰고 있는데. 정작 개발한 Go..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Google Cloud Dataflow 발표 (Google I/O 2014)"/>
+  <meta name="og:description"  content="Google의 VP인 Urs Hölzle 의 키노트 Urs Hölzle: 구글의 8번째 직원이고, 최초의 기술자 출신 VP. 이미 1년 전부터 MapReduce 를 사용하고 있지 않다. Google 이 만들고, 오픈소스 Hadoop 으로 많은 곳에서 쓰고 있는데. 정작 개발한 Go..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/06/27/google-cloud-dataflow-google-i-o-2014.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Google Cloud Dataflow 발표 (Google I/O 2014)"/>
+  <meta name="twitter:description" content="Google의 VP인 Urs Hölzle 의 키노트 Urs Hölzle: 구글의 8번째 직원이고, 최초의 기술자 출신 VP. 이미 1년 전부터 MapReduce 를 사용하고 있지 않다. Google 이 만들고, 오픈소스 Hadoop 으로 많은 곳에서 쓰고 있는데. 정작 개발한 Go..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Google Cloud Dataflow 발표 (Google I/O 2014)</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Google Cloud Dataflow 발표 (Google I/O 2014)</h1>
+    <p class="post-meta"><time datetime="2014-06-27T12:21:00+09:00" itemprop="datePublished">2014-06-27</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><img src="http://imagens.canaltech.com.br/60386.84854-Cloud-Dataflow.jpg" alt="Announcing Google Cloud Dataflow" /></p>
+
+<ul>
+  <li>Google의 VP인 Urs Hölzle 의 키노트
+    <ul>
+      <li><a href="http://en.wikipedia.org/wiki/Urs_H%C3%B6lzle">Urs Hölzle</a>: 구글의 8번째 직원이고, 최초의 기술자 출신 VP.</li>
+    </ul>
+  </li>
+  <li>이미 1년 전부터 <code class="highlighter-rouge">MapReduce</code> 를 사용하고 있지 않다.
+    <ul>
+      <li>Google 이 만들고, 오픈소스 <code class="highlighter-rouge">Hadoop</code> 으로 많은 곳에서 쓰고 있는데.</li>
+      <li>정작 개발한 Google 은 이제 안 쓰고 있다고 한다.</li>
+    </ul>
+  </li>
+  <li>Cloud Dataflow 는 빅데이터 분석 서비스.
+    <ul>
+      <li><code class="highlighter-rouge">FlumeJava</code> 와 <code class="highlighter-rouge">MillWheel</code> 을 기반으로 만들어짐.</li>
+      <li><code class="highlighter-rouge">FlumeJava</code> 는 programming data-parallel computations 을 위한 심플한 순수 자바 라이브러리.</li>
+      <li><code class="highlighter-rouge">MillWheel</code> 은 구글에서 널리 쓰고 있는 low-latency data-processing applications 을 만들기 위한 프레임워크.</li>
+    </ul>
+  </li>
+  <li>e.g. (스트림 처리 예제, 하지만 배치잡도 가능하다)
+    <ul>
+      <li>월드컵 관련 수백만건의 트윗을 1. 긍정과 부정 분석 2. 국가별로 분류.</li>
+      <li>Read: <code class="highlighter-rouge">Cloud Pub/Sub</code> 에서 JSON Stream을 받는다.</li>
+      <li>Transform: 데이터를 변환하고 매핑한다. (구글 번역 API 등을 사용할 수 있음)</li>
+      <li>Analyze: 분석한다.</li>
+      <li><code class="highlighter-rouge">Dataflow Console</code> 화면에서 지금까지 어느정도 처리가 되고있는지 확인할 수 있다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="/assets/2014/140627-89ad01bebfd8c9278da280060b4fbabc-tumblr_inline_n7t581hePp1r7z9vf-85feb77b81fdbc8027a6b77e79b3bb0f94ce5cf6b6442a89a6f43c56835c6c98.png" alt="2014/140627-89ad01bebfd8c9278da280060b4fbabc-tumblr_inline_n7t581hePp1r7z9vf.png" /></p>
+
+<p><img src="/assets/2014/140627-56d4708f2490db058a8bc35ba2d80d53-tumblr_inline_n7t589IqIe1r7z9vf-a7bc5aa10b9569a52b3114eaf03b0a89004f020a3479d50239ff22a9a2f6c8d5.png" alt="2014/140627-56d4708f2490db058a8bc35ba2d80d53-tumblr_inline_n7t589IqIe1r7z9vf.png" /></p>
+
+<p><img src="/assets/2014/140627-2d9abac218a5f3ec81ca939d927f19eb-tumblr_inline_n7t58gBlr61r7z9vf-462d6fcae254fae17457a1089e5b46aac23ec0771a094e94b3875e42c9d65392.png" alt="2014/140627-2d9abac218a5f3ec81ca939d927f19eb-tumblr_inline_n7t58gBlr61r7z9vf.png" /></p>
+
+<p><img src="/assets/2014/140627-b3191e5325f5900c2a2044e7bd73ddae-tumblr_inline_n7t58oMcD41r7z9vf-be10803238af4c3779a42c503fcafc0d2a108d45c81fd161b001561b863ffbcc.png" alt="2014/140627-b3191e5325f5900c2a2044e7bd73ddae-tumblr_inline_n7t58oMcD41r7z9vf.png" /></p>
+
+<p><img src="/assets/2014/140627-013ff65d8da86b3248bef23f430df12a-tumblr_inline_n7t58uttER1r7z9vf-5e2529cf424755c9911e8c29beb691a063626d76865833ad261457ef57a6a115.png" alt="2014/140627-013ff65d8da86b3248bef23f430df12a-tumblr_inline_n7t58uttER1r7z9vf.png" /></p>
+
+<p>링크들</p>
+
+<ul>
+  <li><a href="http://googlecloudplatform.blogspot.com/2014/06/reimagining-developer-productivity-and-data-analytics-in-the-cloud-news-from-google-io.html">Google Cloud Platform Blog: Reimagining developer productivity and data analytics in the cloud - news from Google IO</a></li>
+  <li><a href="http://www.theregister.co.uk/2014/06/25/google_cloud_platform/">Flumejava, Millwheel … No, not NSA codenames: The tech in Google Cloud’s data grokker • The Register</a></li>
+  <li><a href="http://gigaom.com/2014/06/25/google-adds-a-big-data-service-and-lots-of-monitoring-to-its-cloud/">Google adds a big data service and lots of monitoring to its cloud — Tech News and Analysis</a></li>
+  <li><a href="http://techcrunch.com/2014/06/25/google-launches-cloud-dataflow-a-managed-data-processing-service/">Google Launches Cloud Dataflow, A Managed Data Processing Service - TechCrunch</a></li>
+  <li><a href="http://www.itworld.co.kr/news/88243">구글 데이터플로우, 하둡의 ‘대체제’가 아닌 이유</a></li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

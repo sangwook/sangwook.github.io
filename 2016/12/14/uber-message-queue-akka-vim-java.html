@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Uber의 Message Queue, Akka, Vim, Java" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="Uber가 만든 MQ 디자인. (task-queue 용도) uber가 며칠전(12/6) 아래의 제목으로 글을 썼다. “Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog” ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Uber의 Message Queue, Akka, Vim, Java"/>
+  <meta name="og:description"  content="Uber가 만든 MQ 디자인. (task-queue 용도) uber가 며칠전(12/6) 아래의 제목으로 글을 썼다. “Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog” ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2016/12/14/uber-message-queue-akka-vim-java.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Uber의 Message Queue, Akka, Vim, Java"/>
+  <meta name="twitter:description" content="Uber가 만든 MQ 디자인. (task-queue 용도) uber가 며칠전(12/6) 아래의 제목으로 글을 썼다. “Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog” ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Uber의 Message Queue, Akka, Vim, Java</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Uber의 Message Queue, Akka, Vim, Java</h1>
+    <p class="post-meta"><time datetime="2016-12-14T21:59:00+09:00" itemprop="datePublished">2016-12-14</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="uber가-만든-mq-디자인-task-queue-용도">Uber가 만든 MQ 디자인. (task-queue 용도)</h3>
+
+<ul>
+  <li>uber가 며칠전(12/6) 아래의 제목으로 글을 썼다.
+    <ul>
+      <li>“Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog”</li>
+      <li><a href="https://eng.uber.com/cherami/">https://eng.uber.com/cherami/</a></li>
+    </ul>
+  </li>
+  <li>uber는 microservice-architecture(이하 MSA)로 운영하는 것으로 유명하다.
+    <ul>
+      <li>이 글로 MSA에 필수인 queue를 uber는 어떤 디자인으로 만들었는지 알 수 있다.</li>
+      <li>또 어떤 디자인이 실제로 어떻게 구현되고 무슨 고민이 있는지도 알 수 있다.</li>
+      <li>남이 만든 디자인을 관찰하는건 재밌는 일이다.</li>
+      <li>나는 주로 가용성과 확장성에 주목한다.
+        <ul>
+          <li>(나에게) 처리량은 확장성에 포함되고.</li>
+          <li>(나에게) fault-tolerance는 가용성에 포함된다.</li>
+          <li>(물론 엄격히 말하면 다르다.)</li>
+        </ul>
+      </li>
+      <li>uber는 1억개/일 메시지가 오간다고 한다.
+        <ul>
+          <li>계산해보면 평균 1,157개/초 메시지로 추정할 수 있다.</li>
+        </ul>
+      </li>
+      <li>이 메시지가 uber에서 사용되는 사례로 밝힌 것:
+        <ul>
+          <li>post-trip processing</li>
+          <li>fraud detection</li>
+          <li>user notification</li>
+          <li>incentive campaigns</li>
+          <li>등</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>주요 디자인 선택.
+    <ul>
+      <li>가용성을 위한 선택.
+        <ul>
+          <li>competing consumers.</li>
+          <li>replicating messages.</li>
+          <li>eventual consistency.
+            <ul>
+              <li>이 선택은 아마도 순서를 보장하지 않는단 얘기.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>확장성을 위한 선택.
+        <ul>
+          <li>competing consumers.</li>
+          <li>write 처리량을 관찰하다가 확장하는 역할도 미들웨어에서 하는 듯 하다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>나는 새로운 솔루션을 사용 하는 일에는 보수적이다.
+    <ul>
+      <li>새로운 솔루션을 선택하는 일은 많은 단점이 있다.
+        <ul>
+          <li>(논증 생략.)</li>
+        </ul>
+      </li>
+      <li>나는 둘 중 하나의 길을 선호한다.
+        <ol>
+          <li>새로운 솔루션의 “디자인”만 이해하고, 기존 기술로 요구사항에 맞춰 구현한다.</li>
+          <li>아래 조건을 만족한 경우 새로운 솔루션을 사용한다.
+            <ul>
+              <li>솔루션을 아주 깊이 이해했다.</li>
+              <li>동시에 전파하기 쉬운 솔루션이다.</li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+      <li>보통은 디자인을 제대로 이해하지 못하고, 유행을 쫓아 도입하는 경우가 많다.</li>
+      <li>그 중 queue 시스템은 다양한 장단점의 솔루션이 있다.
+        <ul>
+          <li>각 회사마다 각 팀마다 저마다의 queue를 만드는 경향도 있다.</li>
+        </ul>
+      </li>
+      <li>고가용성, 고확장성을 가지고.
+        <ul>
+          <li>보장옵션을 선택하게 하면 좋을텐데.</li>
+          <li>현재는 Amazon SQS 가 그것에 가장 가까웠다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="akka">Akka</h3>
+
+<ul>
+  <li>최근에 Akka와 Actor model의 디자인도 잠깐 검토할 일이 있었다.</li>
+  <li>Akka는 해주는게 거의 없는 틀 이었다.</li>
+  <li>나는 이런 프레임워크를 좋아한다.</li>
+  <li>보통은 X를 보장하면 Y가 떨어진다.
+    <ul>
+      <li>풍선을 누르면 다른 부분이 올라가는 것 처럼.</li>
+      <li>세상의 일은 대부분 tradeoff 다.</li>
+      <li>어떤 프레임워크가 X를 보장한다고 주장한다고 해도.
+        <ul>
+          <li>사실은 그 보장의 경계를 증명하기 위해 많은 비용을 써야한다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Akka는 오버헤드가 없는 틀만 있고 대부분을 개발자에게 위임한다.
+    <ul>
+      <li>그리고 actor model이 구조적으로 살을 붙이기 좋아 보였다.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="vim">vim</h3>
+
+<ul>
+  <li>vim 관련 링크들.</li>
+  <li>2016 NYC Vim talk에서 있었던 “vim 플러그인이 하는 일의 90% 를 플러그인 없이 하는 방법” 이라는 제목의 발표.
+    <ul>
+      <li>영상 <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a>, 슬라이드 <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a></li>
+      <li>재밌게 보긴 했지만, 남는건 별로 없었다.</li>
+      <li>다른 내용은 좀 억지스럽고 부자연스럽게 문제를 해결하려는것 같았다.
+        <ul>
+          <li>플러그인으로 하면 쉬운데 왜 이렇게까지? 하는 기분.</li>
+        </ul>
+      </li>
+      <li>file browser는 나도 nerdtree 보다 netrw 계열을 쓰는데 동의한다.</li>
+      <li>하지만 nerdtree 를 여전히 사용은 하고 있다.</li>
+      <li>그리고 내장된 순수 netrw 는 문제가 좀 있다.</li>
+    </ul>
+  </li>
+  <li>vim 스크립트 칫싯. <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a>
+    <ul>
+      <li>스니핏으로 저장해두고 쓰기 좋다.</li>
+    </ul>
+  </li>
+  <li>파이콘2016 에서 vim과 gnome-desktop을 사용하시는 분이 있었다. <a href='#fn:4' class='footnote' id='fnref:4'>[4]</a>
+    <ul>
+      <li>ruby의 byebug 같은 역할을 python에서는 pudb로 하는것 같다.
+        <ul>
+          <li>gdb와 매핑되는 네이밍으로 보인다.</li>
+          <li>근데 저렇게 UI까지 제공하는건 좋은 선택일까?</li>
+        </ul>
+      </li>
+      <li>nautilus 를 터미널에서 입력하시는거 보니 오래된 gnome-desktop 유저 분이시구나 하는 생각이 들었다.</li>
+      <li>vim에서 python 자동완성을 위해 jedi-vim <a href='#fn:5' class='footnote' id='fnref:5'>[5]</a> 을 사용하신다.</li>
+    </ul>
+  </li>
+  <li>redis를 만든 antirez가 vim을 어떻게 사용하는지 쓴 글을 읽었다. <a href='#fn:6' class='footnote' id='fnref:6'>[6]</a>
+    <ul>
+      <li>antirez가 쓰는 전체 vimrc 는 이것인듯. <a href='#fn:7' class='footnote' id='fnref:7'>[7]</a></li>
+      <li>특별한건 없고, vim을 최소한의 설정으로 사용한다.
+        <ul>
+          <li>vim을 많이 사용하는 유저는 아닌것 같다.</li>
+        </ul>
+      </li>
+      <li>실수방지를 위해 <code class="highlighter-rouge">map 4 $</code> 을 한건 귀요미.
+        <ul>
+          <li>나도 설정해봤는데.</li>
+          <li>너무 불편하여 며칠후에 관뒀다.</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">r!date</code> 는 나도 설정해서 쓰는데, 나같은 사람을 또 만나다니!</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="java">java</h3>
+
+<ul>
+  <li>java 생태계는 unix철학을 따르지 않고, 내가 쓰기엔 불편한 점이 많다.
+    <ul>
+      <li>(나와는 정말 안 맞는것 같ㄷ…)</li>
+    </ul>
+  </li>
+  <li>예를 들어.
+    <ul>
+      <li>현재 프로젝트의 dependency 목록을 보여주는 shell 함수를 만들고 싶었다.
+        <ul>
+          <li>당연히 <code class="highlighter-rouge">mvn help:effective-pom | xml2json | jq '...생략...'</code> 이런식으로 간단히 되겠지. 라고 생각했다.</li>
+          <li>하지만 <code class="highlighter-rouge">mvn help:effective-pom</code> 결과는 xml 외에도 info log정보를 (verbose하게) stdout에 뿌린다.</li>
+          <li>xml만 출력하려면 파일에 쓰고, 그 파일을 읽으면서 작업해야한다.</li>
+          <li>불편하다.</li>
+          <li>verbose 옵션이 디폴트라니.</li>
+          <li>quite 옵션도 없다니.</li>
+        </ul>
+      </li>
+      <li>remote 의존성을 shell에서 검색하고 싶었다.
+        <ul>
+          <li>만약 ruby라면 <code class="highlighter-rouge">gem search kafka</code>
+            <ul>
+              <li>(덧, ruby kafka 라이브러리가 옛날 버전만 지원하는 것을 보고 좀 우울해졌다.)</li>
+            </ul>
+          </li>
+          <li>만약 python이라면 <code class="highlighter-rouge">pip search kafka</code></li>
+          <li>만약 docker라면 <code class="highlighter-rouge">docker search kafka</code></li>
+          <li>만약 apt라면 <code class="highlighter-rouge">apt search kafka</code></li>
+          <li>를 했는데. java에서는 도대체 왜 <code class="highlighter-rouge">mvn search kafka</code> 같은게 없는걸까.</li>
+          <li>라고 생각했는데
+            <ul>
+              <li><code class="highlighter-rouge">mvn-search kafka</code> 식으로 만들 수 있게, 누군가 savant <a href='#fn:8' class='footnote' id='fnref:8'>[8]</a> 라는 도구를 만드셨다.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>모든 dependency의 문자열 검색을 ag 같은 외부 툴로 하고 싶었다.
+        <ul>
+          <li>ruby라면 <code class="highlighter-rouge">ag ~/.rvm/gems/ruby-2.3.1/gems/</code>으로 검색하면 된다.
+            <ul>
+              <li>실제로 이런 검색을 하는 vim 커맨드를 만들고, 키 하나로 찾아간다.</li>
+            </ul>
+          </li>
+          <li>java에서도 이걸 해볼까 해서 시도했는데.
+            <ul>
+              <li>일단 maven repository 에 소스를 올리지 않는 라이브러리가 많다.</li>
+              <li>그리고 모두 jar로 압축된 형태로 <code class="highlighter-rouge">~/.m2/repository</code> 아래에 저장된다.</li>
+            </ul>
+          </li>
+          <li>jar를 풀고 class 를 decompile 해서 저장해야.
+            <ul>
+              <li>ag 같은 외부 툴로 검색하는 기능을 만들 수 있다.</li>
+            </ul>
+          </li>
+          <li>악.</li>
+          <li>안 한다 안 해!</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>java에도 타입추론이 제안되었다. <a href='#fn:9' class='footnote' id='fnref:9'>[9]</a>
+    <ul>
+      <li>자바커뮤니티는 세계 최고의 보수적인 프로그래머 집단이기 때문에
+        <ul>
+          <li>스칼라와 코틀린의 기능들을 아주 천천히 흡수하고 있다.
+            <ul>
+              <li>neovim 의 핵심기능을 vim8 이 흡수하면서 neovim을 죽이고.</li>
+              <li>coffeescript 같은 언어도 결국 흡수되면서 죽는 것 처럼.</li>
+              <li>kotlin 같은 언어는 (너무!) 좋지만 언젠가 죽을 운명의 기술이라 생각한다.</li>
+            </ul>
+          </li>
+          <li>타입추론의 문법은 아래 중 하나로 결정될 것 같다.
+            <ul>
+              <li>var x = expr only (like C#)</li>
+              <li>var, plus val for immutable locals (like Scala, Kotlin)</li>
+              <li>var, plus let for immutable locals (like Swift)</li>
+              <li>auto x = expr (like C++)</li>
+              <li>const x = expr (already a reserved word)</li>
+              <li>final x = expr (already a reserved word)</li>
+              <li>let x = expr</li>
+              <li>def x = expr (like Groovy)</li>
+              <li>x := expr (like Go)</li>
+            </ul>
+          </li>
+          <li>나는 Go 스타일의 <code class="highlighter-rouge">x := expr</code> 으로 선택되면 좋겠는데.
+            <ul>
+              <li>자바스럽지 않다며 기각되었다.
+                <ul>
+                  <li>The Go syntax (a different kind of assignment operator) seems pretty un-Javaish.</li>
+                </ul>
+              </li>
+              <li>자바스럽지 않다니! (하.)</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="https://www.youtube.com/watch?v=XA2WjJbmmoM">https://www.youtube.com/watch?v=XA2WjJbmmoM</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/mcantor/no_plugins/blob/master/no_plugins.vim">https://github.com/mcantor/no_plugins/blob/master/no_plugins.vim</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="http://ricostacruz.com/cheatsheets/vimscript.html">http://ricostacruz.com/cheatsheets/vimscript.html</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:4" id="fn:4" class="reversefootnote">[4]</a>:
+    </span>
+    <span class="content"><a href="https://www.youtube.com/watch?v=xDz8WVO_wjE">https://www.youtube.com/watch?v=xDz8WVO_wjE</a> <a href="#fnref:4" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:5" id="fn:5" class="reversefootnote">[5]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/davidhalter/jedi-vim">https://github.com/davidhalter/jedi-vim</a> <a href="#fnref:5" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:6" id="fn:6" class="reversefootnote">[6]</a>:
+    </span>
+    <span class="content"><a href="http://howivim.com/2016/salvatore-sanfilippo/">http://howivim.com/2016/salvatore-sanfilippo/</a> <a href="#fnref:6" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:7" id="fn:7" class="reversefootnote">[7]</a>:
+    </span>
+    <span class="content"><a href="https://gist.github.com/antirez/3860461">https://gist.github.com/antirez/3860461</a> <a href="#fnref:7" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:8" id="fn:8" class="reversefootnote">[8]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/spilth/savant">https://github.com/spilth/savant</a> <a href="#fnref:8" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:9" id="fn:9" class="reversefootnote">[9]</a>:
+    </span>
+    <span class="content"><a href="http://openjdk.java.net/jeps/286">http://openjdk.java.net/jeps/286</a> <a href="#fnref:9" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

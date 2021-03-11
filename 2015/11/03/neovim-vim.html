@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Neovim 0.1.0 릴리즈" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="어제 Neovim 0.1.0 이 릴리즈 됨 https://news.ycombinator.com/item?id=10488188 https://www.reddit.com/r/vim/comments/3r45y6/neovim_first_public_release_010/ https://w..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Neovim 0.1.0 릴리즈"/>
+  <meta name="og:description"  content="어제 Neovim 0.1.0 이 릴리즈 됨 https://news.ycombinator.com/item?id=10488188 https://www.reddit.com/r/vim/comments/3r45y6/neovim_first_public_release_010/ https://w..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2015/11/03/neovim-vim.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Neovim 0.1.0 릴리즈"/>
+  <meta name="twitter:description" content="어제 Neovim 0.1.0 이 릴리즈 됨 https://news.ycombinator.com/item?id=10488188 https://www.reddit.com/r/vim/comments/3r45y6/neovim_first_public_release_010/ https://w..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Neovim 0.1.0 릴리즈</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Neovim 0.1.0 릴리즈</h1>
+    <p class="post-meta"><time datetime="2015-11-03T17:34:00+09:00" itemprop="datePublished">2015-11-03</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="어제-neovim-010-이-릴리즈-됨">어제 Neovim 0.1.0 이 릴리즈 됨</h3>
+
+<ul>
+  <li><a href="https://news.ycombinator.com/item?id=10488188">https://news.ycombinator.com/item?id=10488188</a></li>
+  <li><a href="https://www.reddit.com/r/vim/comments/3r45y6/neovim_first_public_release_010/">https://www.reddit.com/r/vim/comments/3r45y6/neovim_first_public_release_010/</a></li>
+  <li><a href="https://www.reddit.com/r/neovim/comments/3r4ciu/neovim_010/">https://www.reddit.com/r/neovim/comments/3r4ciu/neovim_010/</a></li>
+</ul>
+
+<h3 id="neovim-을-만든-이유-">Neovim 을 만든 이유 <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a></h3>
+
+<ul>
+  <li>20년 이상의 시간동안, vim은 소수의 사람들만 이해할 수 있는 무시무시한 C89 코드를 조금씩 수정하여 30만 줄의 코드가 되었다.</li>
+  <li>문제는 이 거대한 vim 코드 베이스가 오직 한 사람 Bram Moolenaar 의 책임으로 유지된다는 점이다.</li>
+  <li>이것은 새로운 기능과 버그 수정을 어렵게 한다.</li>
+  <li>vim 은 더이상 plugin 생태계의 개발속도를 따라갈 수 없다.</li>
+  <li>그래서 우리는 다음의 목표를 위해 vim 의 코드를 공격적으로 refactor 하기로 했다.
+    <ul>
+      <li>버그 수정과 기능 추가를 빠르게 개선하기 위해 maintenance 를 단순화 한다.</li>
+      <li>여러 개발자들과 분담하여 개발한다.</li>
+      <li>core source 수정 없이 새롭고 현대적인 UI 구현이 가능하게 한다.</li>
+      <li>플러그인은 어떤 프로그래밍 언어로도 쓸 수 있게 만든다.</li>
+    </ul>
+  </li>
+  <li>이러한 목표를 달성해서 새로운 개발자가 커뮤니티에 참여하게 만들고
+    <ul>
+      <li>그러면 에디터는 개선된다.</li>
+    </ul>
+  </li>
+  <li>무엇보다 중요한 것은
+    <ul>
+      <li>Neovim 은 vim 을 처음부터 다시 쓰는 프로젝트가 아니다.</li>
+      <li>기존 vim 의 편집 모델과 Vimscript 에 거의 영향을 주지 않는다.</li>
+      <li>기존 Vimscript 플러그인은 Neovim 에서도 정상 작동한다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>(플러그인은 msgpack-rpc API, TCP 통신으로 플러그인과 UI 를 구현하는 구조네요.) <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a></p>
+
+<h3 id="vim-을-만든-bram-moolenaar-의-인터뷰-">vim 을 만든 Bram Moolenaar 의 인터뷰 <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a></h3>
+
+<ul>
+  <li>Neovim 에 대해 어떻게 생각하나?
+    <ul>
+      <li>하위호환을 무시하거나 특정 시스템 지원을 안 하는 것 등의 선택은 동의하지 않는다.</li>
+      <li>vim 코드가 오래되고 싫어서 “올바로(right)” 구현하기 위한 것 같은데.</li>
+      <li>오래된 코드는 ugly 하다는 것에 동의한다.</li>
+      <li>하지만 새로 구현하는 것은 아주 많은 노력이 필요할 것이다.</li>
+      <li>Elvis 텍스트 에디터도 새로운 코드로 다시 구현을 시도 했는데.</li>
+      <li>vim 이 기능 확장을 하는 동안 Elvis 는 사용자를 잃었다.</li>
+      <li>Elivs 가 좋은 코드로 작성되었는지 모르지만 사용자는 모른다.</li>
+      <li>neovim 의 좋은 기능들이 다시 vim 에 돌아오길 바란다.
+        <ul>
+          <li>내 말은.</li>
+          <li>누구나 좀더 좋은 플러그인 지원, 좀더 좋은 GUI 와 embedding 을 원한다.</li>
+          <li>더 큰 질문은 그것을 어떻게 누가 적절하게 구현할 것이냐 이다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>덧, 요즘 블로그에 글이 뜸해서 회사에다 쓴 글을 올려봤음.</p>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/neovim/neovim/wiki/Introduction">https://github.com/neovim/neovim/wiki/Introduction</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/neovim/neovim/wiki/Plugin-UI-architecture">https://github.com/neovim/neovim/wiki/Plugin-UI-architecture</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="http://www.binpress.com/blog/2014/11/19/vim-creator-bram-moolenaar-interview/">http://www.binpress.com/blog/2014/11/19/vim-creator-bram-moolenaar-interview/</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

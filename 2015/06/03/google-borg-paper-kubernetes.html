@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Google의 컨테이너 관리 논문 (Borg Paper, Kubernetes)" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="지난달 말(2015-04-17) Google 이 “Large-scale cluster management at Google with Borg” 라는 논문을 발표했다. [1] 최근에 회사 업무로 kubernetes [2] 를 검토하고 있어서 궁금한 부분에 대해서 kubernetes ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Google의 컨테이너 관리 논문 (Borg Paper, Kubernetes)"/>
+  <meta name="og:description"  content="지난달 말(2015-04-17) Google 이 “Large-scale cluster management at Google with Borg” 라는 논문을 발표했다. [1] 최근에 회사 업무로 kubernetes [2] 를 검토하고 있어서 궁금한 부분에 대해서 kubernetes ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2015/06/03/google-borg-paper-kubernetes.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Google의 컨테이너 관리 논문 (Borg Paper, Kubernetes)"/>
+  <meta name="twitter:description" content="지난달 말(2015-04-17) Google 이 “Large-scale cluster management at Google with Borg” 라는 논문을 발표했다. [1] 최근에 회사 업무로 kubernetes [2] 를 검토하고 있어서 궁금한 부분에 대해서 kubernetes ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Google의 컨테이너 관리 논문 (Borg Paper, Kubernetes)</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Google의 컨테이너 관리 논문 (Borg Paper, Kubernetes)</h1>
+    <p class="post-meta"><time datetime="2015-06-03T15:17:00+09:00" itemprop="datePublished">2015-06-03</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li>지난달 말(2015-04-17) Google 이 “Large-scale cluster management at Google with Borg” 라는 논문을 발표했다. <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a></li>
+  <li>최근에 회사 업무로 kubernetes <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a> 를 검토하고 있어서
+    <ul>
+      <li>궁금한 부분에 대해서 kubernetes 코드를 보고, Borg 논문을 읽고 혼자 정리하고 있었는데.</li>
+      <li>앞으로 회사에서 컨테이너 관련 업무를 안 하게 되서 정리한게 아까워서 블로그에라도 남김.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="초록">초록</h3>
+<blockquote>
+  <p>Google’s Borg system is a cluster manager that runs hundreds of thousands of jobs, from many thousands of different applications, across a number of clusters each with up to tens of thousands of machines. It achieves high utilization by combining admission control, efficient task-packing, over-commitment, and machine sharing with process-level performance isolation. It supports high-availability applications with runtime features that minimize fault-recovery time, and scheduling policies that reduce the probability of correlated failures. Borg simplifies life for its users by offering a declarative job specification language, name service integration, real-time job monitoring, and tools to analyze and simulate system behavior. We present a summary of the Borg system architecture and features, important design decisions, a quantitative analysis of some of its policy decisions, and a qualitative examination of lessons learned from a decade of operational experience with it.</p>
+</blockquote>
+
+<ul>
+  <li>일단 초록은 위와 같다.</li>
+  <li>한마디로 Google 의 Borg 시스템은 수만대의 머신으로 구성된 클러스터들에 수십만개의 jobs 을 실행하는 클러스터 매니저라는 소리.</li>
+  <li>내용을 보면 borg 는 C++ 로 작성되어 있고, 이 노하우를 적용하여 오픈소스로 만든것이 kubernetes 이다.
+    <ul>
+      <li>kubernetes 는 현재 go 언어와 docker 기반으로 만들어져 있다.</li>
+      <li>Borg 를 만들었던 엔지니어 대부분이 kubernetes 로 옮겼다고도 함.</li>
+    </ul>
+  </li>
+  <li>구글은 거의 모든 서버를 컨테이너로 돌린다고 하고, 매주 20억개의 컨테이너가 시작된다고 함. <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a></li>
+</ul>
+
+<h3 id="논문에서-관심있게-본-부분만">논문에서 관심있게 본 부분만.</h3>
+
+<h4 id="21-the-workload">2.1 The workload</h4>
+
+<ul>
+  <li>workload 를 아래의 2가지로 나눔.
+    <ul>
+      <li>long-running services (prod)
+        <ul>
+          <li>절대 죽으면 안 됨.</li>
+          <li>빠른 응답시간 (a few μs to a few hundred ms)</li>
+          <li>e.g. Gmail, Google Docs, web search, BigTable 같은 내부 인프라 서비스 등.</li>
+          <li>CPU 70% 를 할당받고 60% 를 사용함.</li>
+          <li>memory 55% 를 할당받고 85% 를 사용함.</li>
+        </ul>
+      </li>
+      <li>batch jobs (non-prod)
+        <ul>
+          <li>몇 초에 끝나는 작업 부터 몇일씩 걸리는 작업들.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>2가지 종류로 나눠서 같은 cell 에 함께 실행하는 것은 자원을 최대한 활용하기 위한 목적이라고 함.</li>
+</ul>
+
+<h4 id="25-priority-quota-and-admission-control">2.5 Priority, quota, and admission control</h4>
+
+<ul>
+  <li>사용자별 quota 와 job 우선순위가 있는데 자세히 안 읽음.</li>
+</ul>
+
+<h4 id="26-naming-and-monitoring">2.6 Naming and monitoring</h4>
+
+<ul>
+  <li>“Borg Name Service” (BNS) 를 만들었다. cell 이름, job 이름, task 번호를 포함한 이름을 각 task 에 붙인다.
+    <ul>
+      <li>목적: 새로운 머신에 task 를 할당하기 위해 다른 머신에 할당된 task를 찾기 위함.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="32-scheduling">3.2 Scheduling</h4>
+
+<ul>
+  <li>scoring 단계에서 선택된 machine 이 만약 새로운 task 를 돌리기에 충분한 자원이 없다면.</li>
+  <li>Borg 는 (task 가 돌아갈 수 있을때까지) 우선순위가 낮은 tasks 를 죽이고 자원을 점유한다(preempts).</li>
+  <li>그리고 죽은 tasks 는 scheduler 의 pending queue 에 들어가서 언젠가 돌아가는 방식인듯.</li>
+  <li>Task startup latency 는 평균 25 초이다.
+    <ul>
+      <li>이것의 80% 는 패키지 설치. (병목은 local disk 쓰기 성능)</li>
+    </ul>
+  </li>
+  <li>참고로 kubernetes 의 소스코드도 요즘 오랫동안 훑어봤는데.
+    <ul>
+      <li>kubernetes 의 스케줄링은 score 가 동일하면 랜덤으로 하나 뽑아서 실행하도록 구현되어 있다. <a href='#fn:4' class='footnote' id='fnref:4'>[4]</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="33-borglet">3.3 Borglet</h4>
+
+<ul>
+  <li>Borgmaster 는 각 Borglet 을 n 초에 한번씩 poll 해서, 머신의 현재 상태를 가져옴.
+    <ul>
+      <li>목적: 통신이 너무 많아 지는 것을 회피.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="34-scalability">3.4 Scalability</h4>
+
+<ul>
+  <li>Borg 의 중앙집중적인 아키텍처의 확장성에 대해선 확신이 없음.</li>
+  <li>지금까지는 limit 까지 근접하고 limit 을 제거해왔다.</li>
+  <li>Borgmaster 는 10~14 CPU 코어와 50 GiB 메모리를 사용.</li>
+</ul>
+
+<h4 id="4-availability">4. Availability</h4>
+
+<ul>
+  <li>Borgmaster 의 가용성이 99.99% 라고 함.
+    <ul>
+      <li>어떻게?
+        <ul>
+          <li>replication for machine failures</li>
+          <li>admission control to avoid overload</li>
+          <li>deploying instances using simple, low-level tools to minimize external dependencies.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="6-isolation">6. Isolation</h4>
+
+<ul>
+  <li>우리 machine 의 50% 는 9개 이상의 tasks 를 돌린다.</li>
+  <li>90%ile 의 machine 은 약 25 tasks 를 가지고 있고, 4500 개의 스레드를 돌린다.</li>
+</ul>
+
+<h4 id="62-performance-isolation">6.2 Performance isolation</h4>
+
+<ul>
+  <li>compressible resources (압축 가능한 자원)
+    <ul>
+      <li>task 를 죽이지 않고도 서비스의 품질을 떨어뜨려서 task 로부터 자원을 돌려받는게 가능한 것들.</li>
+      <li>e.g. CPU cycles, IO bandwidth</li>
+    </ul>
+  </li>
+  <li>non-compressible resources (압축 불가능한 자원)
+    <ul>
+      <li>task 를 죽이지 않고는 자원을 돌려받는게 불가능한 것들.</li>
+      <li>e.g. memory, disk 공간</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="https://research.google.com/pubs/pub43438.html">https://research.google.com/pubs/pub43438.html</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/googlecloudplatform/kubernetes">https://github.com/googlecloudplatform/kubernetes</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="https://speakerdeck.com/jbeda/containers-at-scale">https://speakerdeck.com/jbeda/containers-at-scale</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:4" id="fn:4" class="reversefootnote">[4]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/GoogleCloudPlatform/kubernetes/blob/907b83cd7d6b400725a1a0d0509d601172920fa4/plugin/pkg/scheduler/generic_scheduler.go#L88">https://github.com/GoogleCloudPlatform/kubernetes/blob/907b83cd7d6b400725a1a0d0509d601172920fa4/plugin/pkg/scheduler/generic_scheduler.go#L88</a> <a href="#fnref:4" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

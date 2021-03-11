@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="리누스 토발즈가 말하는 좋은 프로그래머" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="git actually has a simple design, with stable and reasonably well-documented data structures. In fact, I’m a huge proponent of designing your code around the..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="리누스 토발즈가 말하는 좋은 프로그래머"/>
+  <meta name="og:description"  content="git actually has a simple design, with stable and reasonably well-documented data structures. In fact, I’m a huge proponent of designing your code around the..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/04/14/linus-torvalds-good-programmer.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="리누스 토발즈가 말하는 좋은 프로그래머"/>
+  <meta name="twitter:description" content="git actually has a simple design, with stable and reasonably well-documented data structures. In fact, I’m a huge proponent of designing your code around the..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>리누스 토발즈가 말하는 좋은 프로그래머</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">리누스 토발즈가 말하는 좋은 프로그래머</h1>
+    <p class="post-meta"><time datetime="2014-04-14T12:30:00+09:00" itemprop="datePublished">2014-04-14</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <blockquote>
+  <p>git actually has a simple design, with stable and reasonably well-documented data structures. In fact, I’m a huge proponent of designing your code around the data, rather than the other way around, and I think it’s one of the reasons git has been fairly successful (*).</p>
+
+  <p>(*) I will, in fact, claim that the difference between a bad programmer and a good one is whether he considers his code or his data structures more important. Bad programmers worry about the code. Good programmers worry about data structures and their relationships.</p>
+</blockquote>
+
+<ul>
+  <li>git은 안정되고 알맞게 문서화된 “자료 구조”로 구성된 심플한 디자인이다.</li>
+  <li>난 코드를 둘러싼 “데이터”를 디자인하는 것을 우선해야 한다고 생각한다.
+    <ul>
+      <li>(데이터 구조를 잘 디자인하면 좋은 코드는 따라오는 것이라는 주장인듯)</li>
+    </ul>
+  </li>
+  <li>그리고 이게 git이 성공한 이유중 하나라고 생각한다.</li>
+  <li>좋은 프로그래머와 좋지 않은 프로그래머의 차이는 “코드” or “데이터 구조” 중 어느것을 중요시 하는지로 알 수 있다.
+    <ul>
+      <li>좋지 않은 프로그래머는 “코드”에 대해 걱정하고.</li>
+      <li>좋은 프로그래머는 “데이터 구조”와 그것들의 관계를 걱정한다.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><a href="http://lwn.net/Articles/193245/">http://lwn.net/Articles/193245/</a></p>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

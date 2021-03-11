@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="kubernetes, python, kafka 메모" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="kubernetes https://github.com 이 kubernetes 위에서 100% 돌아가도록 이전했다고 한다. [1] 정확히는 rails 웹앱을 모두 kubernetes 클러스터의 컨테이너에 올렸다고 한다. 일단 kubernetes 성공사례라서 좋았고. 실용적인 이야기들..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="kubernetes, python, kafka 메모"/>
+  <meta name="og:description"  content="kubernetes https://github.com 이 kubernetes 위에서 100% 돌아가도록 이전했다고 한다. [1] 정확히는 rails 웹앱을 모두 kubernetes 클러스터의 컨테이너에 올렸다고 한다. 일단 kubernetes 성공사례라서 좋았고. 실용적인 이야기들..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2017/08/27/kubernetes-python-kafka.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2017/170801-1-cf43c3b9490f767f17c2c4fcab6c8d8ad63c60aafc929a0eb5788994157065a3.png"/>
+  <meta name="og:image:width"  content="1080"/>
+  <meta name="og:image:height" content="927"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="kubernetes, python, kafka 메모"/>
+  <meta name="twitter:description" content="kubernetes https://github.com 이 kubernetes 위에서 100% 돌아가도록 이전했다고 한다. [1] 정확히는 rails 웹앱을 모두 kubernetes 클러스터의 컨테이너에 올렸다고 한다. 일단 kubernetes 성공사례라서 좋았고. 실용적인 이야기들..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2017/170801-1-cf43c3b9490f767f17c2c4fcab6c8d8ad63c60aafc929a0eb5788994157065a3.png">
+
+  <title>kubernetes, python, kafka 메모</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">kubernetes, python, kafka 메모</h1>
+    <p class="post-meta"><time datetime="2017-08-27T11:00:00+09:00" itemprop="datePublished">2017-08-27</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h2 id="kubernetes">kubernetes</h2>
+
+<ul>
+  <li><a href="https://github.com">https://github.com</a> 이 kubernetes 위에서 100% 돌아가도록 이전했다고 한다. <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a>
+    <ul>
+      <li>정확히는 rails 웹앱을 모두 kubernetes 클러스터의 컨테이너에 올렸다고 한다.</li>
+      <li>일단 kubernetes 성공사례라서 좋았고.</li>
+      <li>실용적인 이야기들이 많아서 좋았다. (추상적인 이야기가 아니라)</li>
+      <li>예를 들면,
+        <ul>
+          <li>커널 패닉에 대한 실패 테스트를 만들기 위해</li>
+          <li><code class="highlighter-rouge">echo c &gt; /proc/sysrq-trigger</code> 명령을 사용했다는 사례 같은것들.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="python">python</h2>
+
+<ul>
+  <li>최근에는 python을 많이 사용했다.
+    <ul>
+      <li>ruby로는 불가능한 상황이었다.</li>
+      <li>python을 피할 수 없는 상황을 여러번 겪었고,</li>
+      <li>python3.6 이 나쁘지 않았기 때문에</li>
+      <li>“만약 평생 하나의 프로그래밍 언어만 배워야 한다면 python이 맞는게 아닐까?”
+        <ul>
+          <li>하는 이야기를 나도 하게 되었다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>python이 ruby보다 확실히 좋다고 생각하는 점은.
+    <ul>
+      <li>built-in <code class="highlighter-rouge">logging</code> 모듈이 더 좋았고.</li>
+      <li><code class="highlighter-rouge">argparse</code> 모듈도 ruby의 <code class="highlighter-rouge">optparse</code> 보다 엄청나게 더 좋았다.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">','.join(['1','2']) # =&gt; '1,2'</code> 은 여전히 햇갈린다.
+    <ul>
+      <li><code class="highlighter-rouge">['1','2'].join(',') # =&gt; '1,2'</code> 처럼 Array에 join 메소드가 있는 ruby가 나에겐 더 자연스럽다.</li>
+    </ul>
+  </li>
+  <li>python은 <code class="highlighter-rouge">int('1')</code> 처럼 함수로 감싸는 형태로 코드를 작성하는 경향이 있는것 같다.
+    <ul>
+      <li>ruby처럼 <code class="highlighter-rouge">'1'.to_i</code> 가 커서 이동도 적고 나에겐 직관적이다.</li>
+    </ul>
+  </li>
+  <li>python linter는(autopep8, flake8) ruby 보다 관대하다는 인상을 받았다.
+    <ul>
+      <li>ruby가 과도하게 엄격한걸까?</li>
+    </ul>
+  </li>
+  <li>python3.6 부터 숫자에 밑줄을 넣을 수 있다.
+    <ul>
+      <li>ruby는 linter에서 <code class="highlighter-rouge">1000000</code> 대신 <code class="highlighter-rouge">1_000_000</code> 을 쓰라고 가이드한다. <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a>
+        <ul>
+          <li><code class="highlighter-rouge">1000000</code> 은 읽기 어렵고,</li>
+          <li><code class="highlighter-rouge">1_000_000</code> 은 읽기 쉽다.</li>
+        </ul>
+      </li>
+      <li>python은 이게 안 되서 불편함을 참아왔다.
+        <ul>
+          <li>최근 도저히 참기 힘든 코드를 보게 되어 혹시나 하고 찾아봤다.</li>
+          <li>pep-515로 제안되었고 python3.6 부터 반영 되었다는 사실을 발견했다. <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a></li>
+        </ul>
+      </li>
+      <li>그런데 이 pep문서를 읽다가 java도 가능한 문법이라는 사실을 알았다. (그것도 오래전부터) <a href='#fn:4' class='footnote' id='fnref:4'>[4]</a></li>
+    </ul>
+  </li>
+  <li>python을 만든 Guido 형이 2009년에 쓴 “파이썬 함수형 기능의 기원”이라는 글을 읽었다. <a href='#fn:5' class='footnote' id='fnref:5'>[5]</a>
+    <ul>
+      <li>“파이썬이 함수형 언어에서 크게 영향을 받았다고 생각한 적이 없다” 로 시작하는 재밌는 글이었다.</li>
+      <li>파이썬 함수형 스타일에 대해서 약간 어색하게 느껴진 부분이 있었는데</li>
+      <li>이 글을 읽고 이해했다.</li>
+    </ul>
+  </li>
+  <li>python3.6 에서 추가된 syntax 중에 f-string을 좋아한다.
+    <ul>
+      <li>그런데 vim 기본 syntax file 에서는 이 문법이 제대로 지원되지 않는다.</li>
+      <li>숫자에 underscore 같은것도 제대로 표시 되지 않는다.</li>
+      <li>새로운 syntax 파일을 설치하니 잘 표시된다. <a href='#fn:6' class='footnote' id='fnref:6'>[6]</a></li>
+      <li><img src="/assets/2017/170801-3-bfa70f9116ff6a3f16ff8da581678a06760190bb8a585c2c48ff896874ee08f3.png" alt="2017/170801-3.png" /></li>
+    </ul>
+  </li>
+  <li>python3.4에 추가된 pathlib가 너무 좋아서 기존 코드들을 변경했다. <a href='#fn:7' class='footnote' id='fnref:7'>[7]</a>
+    <ul>
+      <li><code class="highlighter-rouge">os.path</code> 보다 좋다.</li>
+      <li>특히 좋은 점이라면 예를들면 아래와 같이 <code class="highlighter-rouge">parent</code> 같은것.</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s">'/home/sangwook/tmp/vim'</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s">'.vimrc'</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h2 id="vim">vim</h2>
+
+<ul>
+  <li>ale에 java를 위한 checkstyle 지원 기능이 추가되었다. <a href='#fn:8' class='footnote' id='fnref:8'>[8]</a>
+    <ul>
+      <li>checkstyle 설정 파일을 수정하다가</li>
+      <li>google의 자바 스타일가이드에는 들여쓰기가 2-spaces 라는 사실을 발견했다. <a href='#fn:9' class='footnote' id='fnref:9'>[9]</a></li>
+      <li>(디폴트 파일을 쓰려고 했는데) 4-spaces 로 설정을 변경해야 했다.</li>
+      <li>왜 구글은 자바 표준을 따르지 않을까.</li>
+      <li>난 4-spaces 를 좋아하지 않지만 표준은 따라야 한다고 생각한다.</li>
+      <li>아니면 표준이 아니고 “사실상 표준”인가?
+        <ul>
+          <li>공개된 장소에 글을 쓰려면 이런것 하나에도 사실 여부를 확인하고 근거 링크를 달아야 하지만.</li>
+          <li>그런 부담을 놓기로 했기 때문에 그냥 넘어가기로 한다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>vim에서 <code class="highlighter-rouge">_spec.rb</code>과 같은 rspec파일을 편집하다가
+    <ul>
+      <li>현재 라인이 포함된 테스트만 실행하고 싶어서 찾아봤다.</li>
+      <li>단순히 <code class="highlighter-rouge">rspec path/to/a_spec.rb:37</code> 이렇게 <code class="highlighter-rouge">:줄번호</code>를 붙이면 되는걸 확인하고 <code class="highlighter-rouge">vimrc</code>를 수정했다.</li>
+      <li>테스트 속도가 아주 빨라졌다!</li>
+    </ul>
+  </li>
+  <li>vim을 종료하는 방법을 물어보는 stackoverflow 질문/답변 페이지가 조회수 1백만을 돌파했다고 한다. <a href='#fn:10' class='footnote' id='fnref:10'>[10]</a>
+    <ul>
+      <li>2016년 전체 PV의 0.005%</li>
+      <li>평일 피크시 80명/시간</li>
+      <li>top 5국가:
+        <ol>
+          <li>우크라이나</li>
+          <li>터키</li>
+          <li>인도네시아</li>
+          <li>파키스탄</li>
+          <li>베트남</li>
+        </ol>
+      </li>
+      <li>이것은 어떤 의미 일까?</li>
+      <li>새로운 프로그래머가 많이 생기고 있는 국가?</li>
+    </ul>
+  </li>
+  <li>최근 vim 업데이트는 <code class="highlighter-rouge">:terminal</code> 관련이 대부분이라. <a href='#fn:11' class='footnote' id='fnref:11'>[11]</a>
+    <ul>
+      <li><img src="/assets/2017/170801-2-bcd8bb5437b460bae9797e5a2a314d5d1e6b02a2f69f7a62d9c80dce72fc269b.png" alt="2017/170801-2.png" /></li>
+      <li>판올림하고 사용해봤다.</li>
+      <li>신기하긴 한데 tmux가 편하기 때문에 안 쓰기로 했다.</li>
+      <li><img src="/assets/2017/170801-1-cf43c3b9490f767f17c2c4fcab6c8d8ad63c60aafc929a0eb5788994157065a3.png" alt="2017/170801-1.png" /></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="kafka-hbase-rabbitmq">kafka, hbase, rabbitmq</h2>
+
+<ul>
+  <li>kafka, hbase, rabbitmq에 대한 성능테스트를 했다.</li>
+  <li>자세히는
+    <ul>
+      <li>kafka 메시지를 소비하고,</li>
+      <li>hbase에 쓰고,</li>
+      <li>rabbitmq에 메시지를 생산하는 것</li>
+    </ul>
+  </li>
+  <li>을 하나의 트랜잭션으로 묶고, 유실이 없고, 초당 최대 5만개 메시지를 처리해야하는게 요구사항이다.</li>
+  <li>유실이 없어야 하니 물론 at-least-once 구성이다.
+    <ul>
+      <li>이론적으로 중복이 발생할 수 있는 구조인데</li>
+      <li>아주 많은 양을 오랫동안 테스트 했고</li>
+      <li>몇 주간 실제 데이터로 운영도 하며 검사했지만 한번도 발생하지 않았다.</li>
+    </ul>
+  </li>
+  <li>성능 테스트에는 빨리 많은 테스트 데이터를 생성하는게 핵심인것 같다.
+    <ul>
+      <li>변수를 변경하면서 많은 실험을 해야 하기 때문이다.</li>
+      <li>나에게 익숙한 것은 ruby이니 ruby-kafka 를 사용했다. <a href='#fn:12' class='footnote' id='fnref:12'>[12]</a>
+        <ul>
+          <li>스레드 수와, flush 하는 버퍼의 크기를 조정하면서 초당 20_000 개 정도를 produce했다.</li>
+          <li>그런데. kafka 에서 느리게라도 produce해놓고,</li>
+          <li>offset을 earliest으로 가져오면 매번 테스트 데이터를 만들필요가 없다는 사실을 회사에서 eric이 알려줬다.
+            <ul>
+              <li>난 왜 일찍 그것을 생각하지 못했을까…</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>이 작업을 하면서 hbase에 대해서도, kafka에 대해서도 배운게 많은데 언젠가 글로 정리할 날이 있겠지.</li>
+</ul>
+
+<h2 id="기타">기타</h2>
+
+<ul>
+  <li>덩케르크
+    <ul>
+      <li>재밌게봤다.</li>
+      <li>전쟁에 승자는 없다.</li>
+      <li>전쟁에 존재하는 것은 과부와 고아 뿐이다.</li>
+    </ul>
+  </li>
+  <li>프로세스와 규칙이 많아 질수록 안정성을 얻을 수 있을지 모르지만, 혁신은 줄어든다고 생각한다.
+    <ul>
+      <li>촘촘한 규칙이 균일한 맛의 맥도날드 햄버거를 보장할지도 모른다.</li>
+      <li>하지만 맥도날드에서 일하는 사람은 자신을 요리사라고 생각하지 않는다.</li>
+      <li>좋은 요리사는 맥도날드로 모이지 않는다.</li>
+    </ul>
+  </li>
+  <li>telegram API를 써서 개인적인 메시지를 받고 있는데.
+    <ul>
+      <li>정말 좋다.</li>
+      <li>내가 필요한것 이상의 모든것이 구현되어 있다.</li>
+      <li>bot을 만드는 것도 쉽다.</li>
+      <li>텔레그램 짱.
+        <ul>
+          <li>markdown형식으로 메시지를 보낼 수도 있고,</li>
+          <li>고정폭글꼴로 표시되게 만들수 있다는 사실을 발견하고 좋아하는 중이다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>SNS에서 정적 기록자(static logger) 관련 토론을 보고 <a href='#fn:13' class='footnote' id='fnref:13'>[13]</a> <a href='#fn:14' class='footnote' id='fnref:14'>[14]</a>
+    <ul>
+      <li>logger를
+        <ul>
+          <li>static으로 했을 때의 단점</li>
+          <li>또는</li>
+          <li>static으로 하지 않을 때의 장점을 (생성자에 logger를 넘기는 방식?)</li>
+          <li>각각 샘플 코드를 통해 주장해 주신다면 읽기 좋을텐데… 하고 생각했다.</li>
+        </ul>
+      </li>
+      <li>하지만 이런들 어떠하고 저런들 어떠하리.</li>
+      <li>나에겐 별로 중요한 관심사가 아니니 패스.</li>
+    </ul>
+  </li>
+  <li>박성철님의 글. <a href='#fn:15' class='footnote' id='fnref:15'>[15]</a>
+    <ul>
+      <li>동의한다.</li>
+      <li>싸고 좋은 사람을 채용하려는 노력이 회사에 이익이라고 생각하겠지만.</li>
+      <li>그것은 보통 더 많은 규칙, 더 많은 프로세스, 문제를 조금 덜 발생시키는 기술을 고민하는 것으로 이어진다.</li>
+    </ul>
+  </li>
+  <li>책을 모두 버렸다.
+    <ul>
+      <li>정확히는 회사 도서관에 기증했다.</li>
+      <li>다시는 책을 안 사야 겠다고 생각했다.</li>
+      <li>몇년전 부터 컨퍼런스는 안 가야겠다고 생각한 것과 비슷하다.</li>
+    </ul>
+  </li>
+  <li>회사에서 대략 2년 x개월 만에 다시 mesos, marathon, 컨테이너 등의 클라우드 컴퓨팅 인프라를 개발하는 부서로 돌아왔다.</li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="https://githubengineering.com/kubernetes-at-github/">https://githubengineering.com/kubernetes-at-github/</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/bbatsov/ruby-style-guide#underscores-in-numerics">https://github.com/bbatsov/ruby-style-guide#underscores-in-numerics</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="https://www.python.org/dev/peps/pep-0515/">https://www.python.org/dev/peps/pep-0515/</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:4" id="fn:4" class="reversefootnote">[4]</a>:
+    </span>
+    <span class="content"><a href="https://docs.oracle.com/javase/7/docs/technotes/guides/language/underscores-literals.html">https://docs.oracle.com/javase/7/docs/technotes/guides/language/underscores-literals.html</a> <a href="#fnref:4" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:5" id="fn:5" class="reversefootnote">[5]</a>:
+    </span>
+    <span class="content"><a href="http://python-history.blogspot.kr/2009/04/origins-of-pythons-functional-features.html">http://python-history.blogspot.kr/2009/04/origins-of-pythons-functional-features.html</a> <a href="#fnref:5" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:6" id="fn:6" class="reversefootnote">[6]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/vim-python/python-syntax">https://github.com/vim-python/python-syntax</a> <a href="#fnref:6" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:7" id="fn:7" class="reversefootnote">[7]</a>:
+    </span>
+    <span class="content"><a href="https://www.python.org/dev/peps/pep-0428/">https://www.python.org/dev/peps/pep-0428/</a> <a href="#fnref:7" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:8" id="fn:8" class="reversefootnote">[8]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/w0rp/ale/commit/9baae52d1afab8af832c4249eefc19e7dd28a251">https://github.com/w0rp/ale/commit/9baae52d1afab8af832c4249eefc19e7dd28a251</a> <a href="#fnref:8" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:9" id="fn:9" class="reversefootnote">[9]</a>:
+    </span>
+    <span class="content"><a href="https://google.github.io/styleguide/javaguide.html#s4.2-block-indentation">https://google.github.io/styleguide/javaguide.html#s4.2-block-indentation</a> <a href="#fnref:9" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:10" id="fn:10" class="reversefootnote">[10]</a>:
+    </span>
+    <span class="content"><a href="https://stackoverflow.blog/2017/05/23/stack-overflow-helping-one-million-developers-exit-vim/">https://stackoverflow.blog/2017/05/23/stack-overflow-helping-one-million-developers-exit-vim/</a> <a href="#fnref:10" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:11" id="fn:11" class="reversefootnote">[11]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/vim/vim/commit/e4f25e4a8db2c8a8a71a4ba2a68540b3ab341e42">https://github.com/vim/vim/commit/e4f25e4a8db2c8a8a71a4ba2a68540b3ab341e42</a> <a href="#fnref:11" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:12" id="fn:12" class="reversefootnote">[12]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/zendesk/ruby-kafka#efficiently-producing-messages">https://github.com/zendesk/ruby-kafka#efficiently-producing-messages</a> <a href="#fnref:12" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:13" id="fn:13" class="reversefootnote">[13]</a>:
+    </span>
+    <span class="content"><a href="https://justhackem.wordpress.com/2017/07/07/no-more-static-logger/">https://justhackem.wordpress.com/2017/07/07/no-more-static-logger/</a> <a href="#fnref:13" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:14" id="fn:14" class="reversefootnote">[14]</a>:
+    </span>
+    <span class="content"><a href="https://www.facebook.com/tobyilee/posts/10210853744514228">https://www.facebook.com/tobyilee/posts/10210853744514228</a> <a href="#fnref:14" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:15" id="fn:15" class="reversefootnote">[15]</a>:
+    </span>
+    <span class="content"><a href="https://www.facebook.com/fupfin.geek/posts/601525090236478">https://www.facebook.com/fupfin.geek/posts/601525090236478</a> <a href="#fnref:15" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

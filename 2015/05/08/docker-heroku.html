@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Docker 로 Heroku 에 배포하기" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했다. [1] 요즘 회사에서, 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷) 를 만들고 있고, Docker 에도 관심이 많기 때문에 한 번 살펴봤다. ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Docker 로 Heroku 에 배포하기"/>
+  <meta name="og:description"  content="며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했다. [1] 요즘 회사에서, 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷) 를 만들고 있고, Docker 에도 관심이 많기 때문에 한 번 살펴봤다. ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2015/05/08/docker-heroku.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Docker 로 Heroku 에 배포하기"/>
+  <meta name="twitter:description" content="며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했다. [1] 요즘 회사에서, 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷) 를 만들고 있고, Docker 에도 관심이 많기 때문에 한 번 살펴봤다. ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Docker 로 Heroku 에 배포하기</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Docker 로 Heroku 에 배포하기</h1>
+    <p class="post-meta"><time datetime="2015-05-08T12:55:00+09:00" itemprop="datePublished">2015-05-08</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><img src="/assets/2015/150508-7125e6bbea1a644561eead81097e3518-tumblr_inline_no0iu5Ur9j1r7z9vf_540-39ed6afa5775189639bc0995d6f24b27d482eb82bf6b546c514739b153f68cfb.jpg" alt="2015/150508-7125e6bbea1a644561eead81097e3518-tumblr_inline_no0iu5Ur9j1r7z9vf_540.jpg" /></p>
+
+<ul>
+  <li>며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했다. <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a></li>
+  <li>요즘 회사에서, 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷) 를 만들고 있고, Docker 에도 관심이 많기 때문에 한 번 살펴봤다.
+    <ul>
+      <li>(내가 안 하면 아무도 안 해줄것 같기도 하고)</li>
+    </ul>
+  </li>
+  <li>살펴본 결론은:
+    <ul>
+      <li>아무 Docker 이미지나 Heroku 에 올려서 돌릴 수 있는건 아니다.
+        <ul>
+          <li>Heroku 가 자동으로 만들어 주는 Dockerfile 을 사용하거나.</li>
+          <li><code class="highlighter-rouge">FROM heroku/cedar:14</code> 이미지를 사용해야 Heroku에 올릴 수 있다. (<code class="highlighter-rouge">/app</code> 아래에 파일들이 들어가는 조건도 있고)</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">ONBUILD</code> 로 코드를 이미지에 포함시키기 때문에, 소스코드를 수정하면 <code class="highlighter-rouge">heroku docker:start</code> 를 해줘야 한다.
+        <ul>
+          <li>개발용으로 volume mount 를 하는 등의 다른 방법이 분명 있겠지?</li>
+        </ul>
+      </li>
+      <li>장점은 (내 생각에는)
+        <ul>
+          <li>앱에 있는 바이너리 의존성 (e.g. imagemagick 같은것?) 을 buildpack 방식에서는 복잡하게 해결해야 했는데</li>
+          <li>Docker 방식에서는 단순히 Dockerfile 에 의존성을 추가하고 PATH 를 추가하면 된다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="heroku-docker-설치">heroku-docker 설치</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku plugins:install heroku-docker
+</code></pre>
+</div>
+
+<h3 id="샘플-앱-clone">샘플 앱 clone</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ git clone https://github.com/heroku/node-js-getting-started.git
+$ cd node-js-getting-started
+</code></pre>
+</div>
+
+<h3 id="dockerinit---현재-디렉터리의-언어에-따라-dockerfile-생성">docker:init - 현재 디렉터리의 언어에 따라 Dockerfile 생성</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:init
+  Wrote Dockerfile (node)
+
+$ cat Dockerfile
+  FROM heroku/cedar:14
+
+  RUN useradd -d /app -m app
+  USER app
+  WORKDIR /app
+
+  ENV HOME /app
+  ENV NODE_ENGINE 0.12.2
+  ENV PORT 3000
+
+  RUN mkdir -p /app/heroku/node
+  RUN curl -s https://s3pository.heroku.com/node/v$NODE_ENGINE/node-v$NODE_ENGINE-linux-x64.tar.gz | tar --strip-components=1 -xz -C /app/heroku/node
+  ENV PATH /app/heroku/node/bin:$PATH
+
+  RUN mkdir -p /app/.profile.d
+  RUN echo "export PATH=\"/app/heroku/node/bin:/app/bin:/app/node_modules/.bin:\$PATH\"" &gt; /app/.profile.d/nodejs.sh
+  RUN echo "cd /app/src" &gt;&gt; /app/.profile.d/nodejs.sh
+
+  EXPOSE 3000
+
+  ONBUILD RUN mkdir -p /app/src
+  ONBUILD COPY . /app/src
+  ONBUILD WORKDIR /app/src
+  ONBUILD RUN npm install
+</code></pre>
+</div>
+
+<h3 id="dockerinit-내부-구현">docker:init 내부 구현</h3>
+
+<ul>
+  <li>buildpack 과 동일한 방식으로 언어를 detect 한다.
+    <ul>
+      <li>e.g. <code class="highlighter-rouge">package.json</code> 가 존재하면 Node.js 로 detect 함. <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a></li>
+    </ul>
+  </li>
+  <li>platforms.detect(dir); <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a></li>
+  <li>fs.writeFileSync(dockerfile, contents); <a href='#fn:4' class='footnote' id='fnref:4'>[4]</a></li>
+  <li>현재 지원되는 언어는 node, python, ruby, scala <a href='#fn:5' class='footnote' id='fnref:5'>[5]</a></li>
+  <li><code class="highlighter-rouge">heroku docker:init --template minimal</code> 으로 최소한의 Dockerfile 을 만들 수 있음.
+    <ul>
+      <li>여기서 생성되는 Dockerfile 이 <a href='#fn:6' class='footnote' id='fnref:6'>[6]</a> 이것.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="herokucedar14-도커-이미지-내부-구현">heroku/cedar:14 도커 이미지 내부 구현</h3>
+
+<ul>
+  <li>이미지는 Docker Registry 에 올라가 있음. <a href='#fn:7' class='footnote' id='fnref:7'>[7]</a></li>
+  <li>Cedar-14 는 ubuntu 14.04 LTS 를 기반으로 한 스택이고, 설치되는 ubuntu package 는 여기에. <a href='#fn:8' class='footnote' id='fnref:8'>[8]</a></li>
+</ul>
+
+<p>Dockerfile 은 아래와 같이 단순함. <a href='#fn:9' class='footnote' id='fnref:9'>[9]</a></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>FROM ubuntu-debootstrap:14.04
+COPY ./bin/cedar-14.sh /tmp/build.sh
+RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive /tmp/build.sh \
+  &amp;&amp; rm -rf /var/lib/apt/lists/*
+</code></pre>
+</div>
+
+<ul>
+  <li>ubuntu-debootstrap 의 Docker Registry <a href='#fn:10' class='footnote' id='fnref:10'>[10]</a>
+    <ul>
+      <li>github.com/tianon/docker-brew-ubuntu-debootstrap 여기에 Dockerfile 이 있다는 것을 알 수 있음. <a href='#fn:11' class='footnote' id='fnref:11'>[11]</a></li>
+      <li><code class="highlighter-rouge">ubuntu-debootstrap:14.04</code> 의 Dockerfile <a href='#fn:12' class='footnote' id='fnref:12'>[12]</a></li>
+    </ul>
+  </li>
+  <li>즉 <code class="highlighter-rouge">heroku/cedar:14</code> 는 용량이 작은 최소한의 ubuntu docker image 에</li>
+  <li>cedar-14.sh 를 실행시킨다. <code class="highlighter-rouge">cedar-14.sh</code> 의 코드 <a href='#fn:13' class='footnote' id='fnref:13'>[13]</a></li>
+</ul>
+
+<h3 id="dockerstart---로컬에-컨테이너를-시작">docker:start - 로컬에 컨테이너를 시작</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:start
+  building image...
+  Sending build context to Docker daemon 285.2 kB
+  Sending build context to Docker daemon
+  Step 0 : FROM heroku/cedar:14
+  Pulling repository heroku/cedar
+  66766a8c5395: Download complete
+  c40496787f7c: Download complete
+  f90b0e99841d: Download complete
+  ac0bf528748f: Download complete
+  Status: Downloaded newer image for heroku/cedar:14
+   ---&gt; 66766a8c5395
+  ... docker 이미지 빌드 생략 ...
+  Successfully built d3e547511a82
+
+  starting container...
+  web process will be available at http://localhost:3000/
+  Node app is running on port 3000
+</code></pre>
+</div>
+
+<h3 id="dockerstart-내부-구현">docker:start 내부 구현.</h3>
+
+<ul>
+  <li>start.js <a href='#fn:14' class='footnote' id='fnref:14'>[14]</a>
+    <ul>
+      <li>Procfile 을 읽어서 여기에 적혀있는 command 가 Docker 가 실행될때 command 로 전달됨.</li>
+      <li>docker.ensureStartImage <a href='#fn:15' class='footnote' id='fnref:15'>[15]</a>
+        <ul>
+          <li>docker.js#ensureStartImage() <a href='#fn:16' class='footnote' id='fnref:16'>[16]</a></li>
+          <li>docker.js#buildImage <a href='#fn:17' class='footnote' id='fnref:17'>[17]</a>
+            <ul>
+              <li><code class="highlighter-rouge">build --force-rm --file="${dockerfile}" --tag="${id}" "${dir}"</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>docker.js#runImage() <a href='#fn:18' class='footnote' id='fnref:18'>[18]</a>
+    <ul>
+      <li><code class="highlighter-rouge">run -w /app/src -p 3000:3000 --rm -it ${mountComponent} ${envArgComponent} ${imageId} sh -c "${command}" || true</code> <a href='#fn:19' class='footnote' id='fnref:19'>[19]</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="컨테이너에-명령-실행">컨테이너에 명령 실행</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:exec npm install --save --no-bin-links cool-ascii-faces
+$ heroku docker:exec ls node_modules
+</code></pre>
+</div>
+
+<h3 id="dockerexec-내부-구현">docker:exec 내부 구현</h3>
+
+<ul>
+  <li><code class="highlighter-rouge">docker exec</code> 를 한 번 감싼 형태.</li>
+  <li>exec.js <a href='#fn:20' class='footnote' id='fnref:20'>[20]</a></li>
+  <li>docker.js#runImage() <a href='#fn:21' class='footnote' id='fnref:21'>[21]</a></li>
+</ul>
+
+<h3 id="dockerrelease---배포">docker:release - 배포</h3>
+
+<p>아래의 명령으로 배포 가능하다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:release
+</code></pre>
+</div>
+
+<ul>
+  <li>이것은 heroku 가 기존에 사용하던 Buildpack 기반의 빌드시스템을 사용하지 않음.</li>
+  <li>대신, Docker 이미지에 앱의 코드와 의존성을 포함하고, 로컬의 Docker 이미지를 직접 배포함.</li>
+</ul>
+
+<h3 id="dockerrelease-내부-구현">docker:release 내부 구현</h3>
+
+<ul>
+  <li>Heroku 로 배포.</li>
+  <li>컨테이너를 올려서 /app 디렉터리를 압축한다.
+    <ul>
+      <li>이 압축파일에는 language 의 runtime 과 앱의 소스코드를 포함함.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>release.js <a href='#fn:22' class='footnote' id='fnref:22'>[22]</a></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>docker run -d ${imageId} tar cfvz /tmp/slug.tgz -C / --exclude=.git --exclude=.heroku ./app
+docker wait ${containerId}
+docker cp ${containerId}:/tmp/slug.tgz ${slugPath}
+docker rm -f ${containerId}
+slug.tgz
+</code></pre>
+</div>
+
+<ul>
+  <li>만들어진 slug 압축파일을 HTTP PUT 을 통해 업로드하도록 구현 되어 있음. <a href='#fn:23' class='footnote' id='fnref:23'>[23]</a> <a href='#fn:24' class='footnote' id='fnref:24'>[24]</a></li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="https://blog.heroku.com/archives/2015/5/5/introducing_heroku_docker_release_build_deploy_heroku_apps_with_docker">https://blog.heroku.com/archives/2015/5/5/introducing_heroku_docker_release_build_deploy_heroku_apps_with_docker</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/master/commands/init.js#L27">https://github.com/heroku/heroku-docker/blob/master/commands/init.js#L27</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/master/commands/init.js#L38">https://github.com/heroku/heroku-docker/blob/master/commands/init.js#L38</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:4" id="fn:4" class="reversefootnote">[4]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/master/platforms/node/index.js#L11-L12">https://github.com/heroku/heroku-docker/blob/master/platforms/node/index.js#L11-L12</a> <a href="#fnref:4" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:5" id="fn:5" class="reversefootnote">[5]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/tree/master/platforms">https://github.com/heroku/heroku-docker/tree/master/platforms</a> <a href="#fnref:5" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:6" id="fn:6" class="reversefootnote">[6]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/master/platforms/minimal/Dockerfile.t">https://github.com/heroku/heroku-docker/blob/master/platforms/minimal/Dockerfile.t</a> <a href="#fnref:6" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:7" id="fn:7" class="reversefootnote">[7]</a>:
+    </span>
+    <span class="content"><a href="https://registry.hub.docker.com/u/heroku/cedar/">https://registry.hub.docker.com/u/heroku/cedar/</a> <a href="#fnref:7" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:8" id="fn:8" class="reversefootnote">[8]</a>:
+    </span>
+    <span class="content"><a href="https://devcenter.heroku.com/articles/cedar-ubuntu-packages">https://devcenter.heroku.com/articles/cedar-ubuntu-packages</a> <a href="#fnref:8" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:9" id="fn:9" class="reversefootnote">[9]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/tt/stack-images/blob/master/Dockerfile">https://github.com/tt/stack-images/blob/master/Dockerfile</a> <a href="#fnref:9" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:10" id="fn:10" class="reversefootnote">[10]</a>:
+    </span>
+    <span class="content"><a href="https://registry.hub.docker.com/_/ubuntu-debootstrap/">https://registry.hub.docker.com/_/ubuntu-debootstrap/</a> <a href="#fnref:10" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:11" id="fn:11" class="reversefootnote">[11]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/docker-library/official-images/blob/master/library/ubuntu-debootstrap">https://github.com/docker-library/official-images/blob/master/library/ubuntu-debootstrap</a> <a href="#fnref:11" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:12" id="fn:12" class="reversefootnote">[12]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/tianon/docker-brew-ubuntu-debootstrap/blob/dist/14.04/Dockerfile">https://github.com/tianon/docker-brew-ubuntu-debootstrap/blob/dist/14.04/Dockerfile</a> <a href="#fnref:12" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:13" id="fn:13" class="reversefootnote">[13]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/tt/stack-images/blob/master/bin/cedar-14.sh">https://github.com/tt/stack-images/blob/master/bin/cedar-14.sh</a> <a href="#fnref:13" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:14" id="fn:14" class="reversefootnote">[14]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/start.js#L38">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/start.js#L38</a> <a href="#fnref:14" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:15" id="fn:15" class="reversefootnote">[15]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L49">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L49</a> <a href="#fnref:15" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:16" id="fn:16" class="reversefootnote">[16]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L54">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L54</a> <a href="#fnref:16" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:17" id="fn:17" class="reversefootnote">[17]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/start.js#L31">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/start.js#L31</a> <a href="#fnref:17" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:18" id="fn:18" class="reversefootnote">[18]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L96">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L96</a> <a href="#fnref:18" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:19" id="fn:19" class="reversefootnote">[19]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L61">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L61</a> <a href="#fnref:19" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:20" id="fn:20" class="reversefootnote">[20]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/exec.js#L22">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/exec.js#L22</a> <a href="#fnref:20" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:21" id="fn:21" class="reversefootnote">[21]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L49">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L49</a> <a href="#fnref:21" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:22" id="fn:22" class="reversefootnote">[22]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/release.js#L25">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/release.js#L25</a> <a href="#fnref:22" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:23" id="fn:23" class="reversefootnote">[23]</a>:
+    </span>
+    <span class="content"><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/release.js#L74-L82">https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/release.js#L74-L82</a> <a href="#fnref:23" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:24" id="fn:24" class="reversefootnote">[24]</a>:
+    </span>
+    <span class="content"><a href="https://devcenter.heroku.com/articles/platform-api-deploying-slugs">https://devcenter.heroku.com/articles/platform-api-deploying-slugs</a> <a href="#fnref:24" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

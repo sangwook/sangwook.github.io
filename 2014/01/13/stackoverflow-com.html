@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Stackoverflow.com 의 아키텍처" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="110개의 Q&amp;amp;A 사이트 사용자: 430만명 질문: 760만건 답변: 1,360만건 최근 30일 PV: 5.6억 (Y/Y 100% 성장중) 서버 25대 웹서버 11대 로드밸런서 1대 (+ 예비1대) DB서버 4대 검색서버(ElasticSearch) 3대 Redis 2대 DB..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Stackoverflow.com 의 아키텍처"/>
+  <meta name="og:description"  content="110개의 Q&amp;amp;A 사이트 사용자: 430만명 질문: 760만건 답변: 1,360만건 최근 30일 PV: 5.6억 (Y/Y 100% 성장중) 서버 25대 웹서버 11대 로드밸런서 1대 (+ 예비1대) DB서버 4대 검색서버(ElasticSearch) 3대 Redis 2대 DB..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/01/13/stackoverflow-com.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Stackoverflow.com 의 아키텍처"/>
+  <meta name="twitter:description" content="110개의 Q&amp;amp;A 사이트 사용자: 430만명 질문: 760만건 답변: 1,360만건 최근 30일 PV: 5.6억 (Y/Y 100% 성장중) 서버 25대 웹서버 11대 로드밸런서 1대 (+ 예비1대) DB서버 4대 검색서버(ElasticSearch) 3대 Redis 2대 DB..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Stackoverflow.com 의 아키텍처</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Stackoverflow.com 의 아키텍처</h1>
+    <p class="post-meta"><time datetime="2014-01-13T22:33:00+09:00" itemprop="datePublished">2014-01-13</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li>110개의 Q&amp;A 사이트</li>
+  <li>사용자: 430만명</li>
+  <li>질문: 760만건</li>
+  <li>답변: 1,360만건</li>
+  <li>최근 30일 PV: 5.6억 (Y/Y 100% 성장중)</li>
+  <li>서버 25대
+    <ul>
+      <li>웹서버 11대</li>
+      <li>로드밸런서 1대 (+ 예비1대)</li>
+      <li>DB서버 4대</li>
+      <li>검색서버(ElasticSearch) 3대</li>
+      <li>Redis 2대</li>
+    </ul>
+  </li>
+  <li>DB서버는 CPU 10% 를 유지하고, 384GB RAM 정도가 효과가 있었다.
+    <ul>
+      <li>웹서버도 CPU 10% ~ 15% 정도 유지하도록 함.</li>
+    </ul>
+  </li>
+  <li>.NET 프레임워크 프로젝트 9개
+    <ul>
+      <li>Build, SocketServer, StackAuth, Stackoverflow, Api, Api v2, Mobile, Tests</li>
+      <li>코드 11만줄</li>
+      <li>테스트 코드는 총 287개로 적다.</li>
+      <li>대신 meta.stackoverflow.com 에 적용하고 이곳에서 유저들이 버그를 적극적으로 말해주고 있다. ㅎㅎ</li>
+      <li>빠르게 움직이고 문제가 생기면 고친다.
+        <ul>
+          <li>하루에 실서버도 5번 배포한다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>거의 모든 곳에서 캐싱을 한다
+    <ul>
+      <li>Network Level Caches (Browser, CDN, etc.)</li>
+      <li>Server Level Cache (HttpRuntime.Cache)</li>
+      <li>Site Level Cache (Redis)</li>
+      <li>SQL Server Database Cache (384 gigs of RAM!)</li>
+      <li>Solid State Disk</li>
+    </ul>
+  </li>
+  <li>정적 메소드, 정적 클래스를 사용하여 캐싱한다.
+    <ul>
+      <li>(흠… 이 부분은 정확히 이해가 안 되지만 대충 이해한걸 적어보자면…)</li>
+      <li>이게 객체지향 관점에선 별로 좋지 않다.</li>
+      <li>하지만 성능이 좋으니까.</li>
+      <li>예를 들어. 답변 리스팅의 탭은 active, oldest, votes 가 있는데.
+        <ul>
+          <li>3가지 탭을 위한 클래스 처리가 실제로 나노초 밖에 걸리지 않지만.</li>
+          <li>그래도 무조건 캐싱 한다.</li>
+          <li>클래스를 만들면 가비지 컬렉터 대상이 늘기 때문이다.</li>
+          <li>그래서 클래스 복사본을 만들고 캐싱을 하고, 각 페이지에서 재사용하는 구조로 되어있다.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>개발자는 5명</li>
+  <li>성능을 위해 .NET 어셈블리 레벨까지 디어셈블해서 판다.</li>
+</ul>
+
+<p>슬라이드:</p>
+
+<script async="" class="speakerdeck-embed" data-id="5d1a9cd029ce013115d3166c869a4812" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
+
+<p>동영상:</p>
+
+<iframe width="560" height="315" src="//www.youtube.com/embed/OGi8FT2j8hE" frameborder="0" allowfullscreen=""></iframe>
+
+<p>p.s, 월PV 5억 이상의 트래픽이 나오는 사이트도. DB 4대에 개발자 5명으로 운영된다니. 대단하다. (이정도 트래픽이면 내가 봐왔던 곳에서는 얼마나 많은 리소스를 쓸지…)</p>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

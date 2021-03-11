@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="Facebook이 분산 key-value 스토어를 확장한 과정" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="0개의 memcache 서버 소수의 DB로도 load를 감당하기에 충분함. 데이터는 여러 DB로 샤드된 상태. 문제: High fanout multiple rounds of data fetching 조금의 memcache 서버 “읽기” 성능을 더 개선해야 한다. 10대의 서버, 초..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Facebook이 분산 key-value 스토어를 확장한 과정"/>
+  <meta name="og:description"  content="0개의 memcache 서버 소수의 DB로도 load를 감당하기에 충분함. 데이터는 여러 DB로 샤드된 상태. 문제: High fanout multiple rounds of data fetching 조금의 memcache 서버 “읽기” 성능을 더 개선해야 한다. 10대의 서버, 초..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/07/20/scaling-memcache-at-facebook.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Facebook이 분산 key-value 스토어를 확장한 과정"/>
+  <meta name="twitter:description" content="0개의 memcache 서버 소수의 DB로도 load를 감당하기에 충분함. 데이터는 여러 DB로 샤드된 상태. 문제: High fanout multiple rounds of data fetching 조금의 memcache 서버 “읽기” 성능을 더 개선해야 한다. 10대의 서버, 초..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Facebook이 분산 key-value 스토어를 확장한 과정</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Facebook이 분산 key-value 스토어를 확장한 과정</h1>
+    <p class="post-meta"><time datetime="2014-07-20T17:17:00+09:00" itemprop="datePublished">2014-07-20</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="0개의-memcache-서버">0개의 memcache 서버</h3>
+
+<ul>
+  <li>소수의 DB로도 load를 감당하기에 충분함.</li>
+  <li>데이터는 여러 DB로 샤드된 상태.</li>
+  <li>문제:
+    <ul>
+      <li>High fanout</li>
+      <li>multiple rounds of data fetching</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="조금의-memcache-서버">조금의 memcache 서버</h3>
+
+<ul>
+  <li>“읽기” 성능을 더 개선해야 한다.
+    <ul>
+      <li>10대의 서버, 초당 100만 오퍼레이션.</li>
+    </ul>
+  </li>
+  <li>문제:
+    <ul>
+      <li>look-aside caching 문제
+        <ul>
+          <li>여러 웹서버가 병렬로 memcache set 을 할 때 문제가 발생하고</li>
+          <li>이걸 해결하기 위해 memcache 프로토콜 확장인 “lease”를 사용.</li>
+          <li>cache miss 를 하면 lease-id를 주고, 이 id가 있는 곳만 set을 하게 함.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="1개의-cluster-안에-많은-memcache-서버">1개의 cluster 안에 많은 memcache 서버</h3>
+
+<ul>
+  <li>“읽기” 성능을 더더 개선해야 한다.
+    <ul>
+      <li>100대의 서버, 초당 1천만 오퍼레이션</li>
+    </ul>
+  </li>
+  <li>아이템은 여러 memcache 서버에, consistent hasing 으로 분산된다.</li>
+  <li>문제:
+    <ul>
+      <li>모든 웹서버와 모든 memcache 서버가 다대다 통신을 한다.</li>
+      <li>1개의 사용자 요청에 대해 100여개의 memcache 서버에서 가져온다.</li>
+      <li>네트워크 스위치의 버퍼가 넘쳐서 패킷이 손실됨.</li>
+      <li>해결: 슬라이딩 윈도우로 동시 요청 제한</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="여러-개의-cluster-안의-많은-memcache-서버">여러 개의 cluster 안의 많은 memcache 서버</h3>
+
+<ul>
+  <li>1000대의 서버, 초당 1억 오퍼레이션</li>
+  <li>캐시의 consistent 를 유지해야하고, 데이터 over-replication 도 관리해야함.</li>
+  <li>캐시된 데이터는 DB가 업데이트 되면 캐시가 제거 되어야 함.</li>
+  <li>해결:
+    <ul>
+      <li>mysql commit log 를 tail 하고, 캐시를 제거하는 프로그램을 만들어 각 DB서버에서 돌아가게 함. (McSqueal)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="지리적으로-분산된-여러개의-cluster">지리적으로 분산된 여러개의 cluster</h3>
+
+<ul>
+  <li>1000대의 서버, 초당 10억 오퍼레이션</li>
+  <li>Replica 를 다른 지역에 구성.</li>
+  <li>문제:
+    <ul>
+      <li>웹서버에서 마스터DB 로 데이터를 쓰고.</li>
+      <li>마스터DB 에서 Replica DB로 replication이 완료되기 전에</li>
+      <li>다른 웹서버에서 cache miss 가 일어나고.</li>
+      <li>Replica DB에서 (잘못된 값으로) cache set 이 일어남.</li>
+    </ul>
+  </li>
+  <li>해결: Remote Markers
+    <ul>
+      <li>마스터DB에 쓰기전에, remote marker 를 set 하고.</li>
+      <li>remote marker 가 set 되어 있으면 replica DB가 아닌 master DB에서 데이터를 읽음.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="링크">링크</h3>
+
+<ul>
+  <li><a href="https://www.usenix.org/sites/default/files/conference/protected-files/nishtala_nsdi13_slides.pdf">슬라이드</a></li>
+  <li><a href="https://www.usenix.org/conference/nsdi13/technical-sessions/presentation/nishtala">발표 영상</a></li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

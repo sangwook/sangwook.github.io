@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="vim 명령모드에서 영문 키보드로 자동으로 전환되게 만들기" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="문제 vim의 insert mode 에서 한글을 입력하다가 ESC 로 빠져나오면 영문 키보드 레이아웃으로 바꾸기 위해 항상 &amp;lt;한/영 전환 키&amp;gt;를 눌러야 한다. 왜냐하면, insert mode 를 제외하고는 한글 키보드는 쓸모없기 때문이다. 그래서 insert mode 가..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="vim 명령모드에서 영문 키보드로 자동으로 전환되게 만들기"/>
+  <meta name="og:description"  content="문제 vim의 insert mode 에서 한글을 입력하다가 ESC 로 빠져나오면 영문 키보드 레이아웃으로 바꾸기 위해 항상 &amp;lt;한/영 전환 키&amp;gt;를 눌러야 한다. 왜냐하면, insert mode 를 제외하고는 한글 키보드는 쓸모없기 때문이다. 그래서 insert mode 가..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2015/01/01/vim-insert-mode-keyboard-switch.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="vim 명령모드에서 영문 키보드로 자동으로 전환되게 만들기"/>
+  <meta name="twitter:description" content="문제 vim의 insert mode 에서 한글을 입력하다가 ESC 로 빠져나오면 영문 키보드 레이아웃으로 바꾸기 위해 항상 &amp;lt;한/영 전환 키&amp;gt;를 눌러야 한다. 왜냐하면, insert mode 를 제외하고는 한글 키보드는 쓸모없기 때문이다. 그래서 insert mode 가..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>vim 명령모드에서 영문 키보드로 자동으로 전환되게 만들기</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">vim 명령모드에서 영문 키보드로 자동으로 전환되게 만들기</h1>
+    <p class="post-meta"><time datetime="2015-01-01T17:11:00+09:00" itemprop="datePublished">2015-01-01</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h2 id="문제">문제</h2>
+
+<ul>
+  <li>vim의 insert mode 에서 한글을 입력하다가
+    <ul>
+      <li><code class="highlighter-rouge">ESC</code> 로 빠져나오면 영문 키보드 레이아웃으로 바꾸기 위해 항상 <code class="highlighter-rouge">&lt;한/영 전환 키&gt;</code>를 눌러야 한다.</li>
+    </ul>
+  </li>
+  <li>왜냐하면, insert mode 를 제외하고는 한글 키보드는 쓸모없기 때문이다.</li>
+  <li>그래서 insert mode 가 아니면 항상 <strong>영문 키보드 레이아웃</strong> 으로 전환되는 방법을 찾게 되었다.</li>
+  <li>gvim 에서는 기본으로 되는 기능이다.</li>
+  <li>(terminal 아래에서 실행되는) vim에서는 기본적으로 이 기능이 없다.</li>
+</ul>
+
+<h2 id="해결">해결</h2>
+
+<p>몇 시간 동안의 삽질을 했지만. 삽질은 생략하고. 결론적으로는 아래의 순서로 <code class="highlighter-rouge">input-source-switcher</code> 를 빌드해서 설치한다.</p>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code>git clone git@github.com:vovkasm/input-source-switcher.git
+<span class="nb">cd </span>input-source-switcher
+mkdir build
+<span class="nb">cd </span>build
+cmake ..
+make
+make install
+</code></pre>
+</div>
+
+<p>그리고 <code class="highlighter-rouge">.vimrc</code> 에 아래의 코드를 추가하면 된다.</p>
+
+<div class="language-vim highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> has<span class="p">(</span><span class="s1">'mac'</span><span class="p">)</span> &amp;&amp; filereadable<span class="p">(</span><span class="s1">'/usr/local/lib/libInputSourceSwitcher.dylib'</span><span class="p">)</span>
+  autocmd <span class="nb">InsertLeave</span> * <span class="k">call</span> libcall<span class="p">(</span><span class="s1">'/usr/local/lib/libInputSourceSwitcher.dylib'</span><span class="p">,</span> <span class="s1">'Xkb_Switch_setXkbLayout'</span><span class="p">,</span> <span class="s1">'com.apple.keylayout.US'</span><span class="p">)</span>
+<span class="k">endif</span>
+</code></pre>
+</div>
+
+<h2 id="ps">p.s,</h2>
+
+<ul>
+  <li>새해다.</li>
+  <li>나는 새해부터 이런 비생산적인 일에 집착하고 있었다.</li>
+  <li>요 며칠 동안 vimrc를 정리하고, 새로운 플러그인들을 찾아다니며
+    <ul>
+      <li>마약과도 같은 개발환경세팅으로 시간을 허비하고 있었다.</li>
+    </ul>
+  </li>
+  <li>제자리로 돌아와야지.</li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

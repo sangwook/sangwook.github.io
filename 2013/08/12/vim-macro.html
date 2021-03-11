@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="vim macro 저장" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="문제 vim에서 내가 방금 만든 매크로를 저장해놓고 싶다. 해결 insert mode 에서 a 를 입력하면 @a 매크로에 들어있는 내용들이 입력된다. 즉, vimrc 에다가 let @z = &#39; 를 입력하고. a 를 입력해서 @a 에 있는 매크로를 붙여넣고. 저장하면. @z 에 방금..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="vim macro 저장"/>
+  <meta name="og:description"  content="문제 vim에서 내가 방금 만든 매크로를 저장해놓고 싶다. 해결 insert mode 에서 a 를 입력하면 @a 매크로에 들어있는 내용들이 입력된다. 즉, vimrc 에다가 let @z = &#39; 를 입력하고. a 를 입력해서 @a 에 있는 매크로를 붙여넣고. 저장하면. @z 에 방금..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2013/08/12/vim-macro.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="vim macro 저장"/>
+  <meta name="twitter:description" content="문제 vim에서 내가 방금 만든 매크로를 저장해놓고 싶다. 해결 insert mode 에서 a 를 입력하면 @a 매크로에 들어있는 내용들이 입력된다. 즉, vimrc 에다가 let @z = &#39; 를 입력하고. a 를 입력해서 @a 에 있는 매크로를 붙여넣고. 저장하면. @z 에 방금..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>vim macro 저장</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">vim macro 저장</h1>
+    <p class="post-meta"><time datetime="2013-08-12T14:51:00+09:00" itemprop="datePublished">2013-08-12</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>문제</p>
+
+<ul>
+  <li>vim에서 내가 방금 만든 매크로를 저장해놓고 싶다.</li>
+</ul>
+
+<p>해결</p>
+
+<ul>
+  <li>insert mode 에서 <code class="highlighter-rouge">a</code> 를 입력하면 <code class="highlighter-rouge">@a</code> 매크로에 들어있는 내용들이 입력된다.</li>
+  <li>즉, vimrc 에다가 <code class="highlighter-rouge">let @z = '</code> 를 입력하고.</li>
+  <li><code class="highlighter-rouge">a</code> 를 입력해서 @a 에 있는 매크로를 붙여넣고. 저장하면.</li>
+  <li>@z 에 방금의 매크로가 저장되어 있다.</li>
+</ul>
+
+<p>참고</p>
+
+<ul>
+  <li><code class="highlighter-rouge">let @z = ''</code> 에서 <code class="highlighter-rouge">'</code>에 대한 escape 는 <code class="highlighter-rouge">\'</code> 이 아니라 <code class="highlighter-rouge">''</code> 이다.</li>
+</ul>
+
+
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="클라우드 컴퓨팅, OpenStack 메모" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="OpenStack 커뮤니티가 private 클라우드의 성장을 방해하고 있다는 Matt Asay의 2015년 1월 20일 글 클라우드라는 말이 뉴스에 등장한지 오래되었지만, 기업에서 클라우드를 사용하는 비중은 표면에 scratch 를 내는 정도에 불과하다. 2014년 기업용 IT시장..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="클라우드 컴퓨팅, OpenStack 메모"/>
+  <meta name="og:description"  content="OpenStack 커뮤니티가 private 클라우드의 성장을 방해하고 있다는 Matt Asay의 2015년 1월 20일 글 클라우드라는 말이 뉴스에 등장한지 오래되었지만, 기업에서 클라우드를 사용하는 비중은 표면에 scratch 를 내는 정도에 불과하다. 2014년 기업용 IT시장..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2015/02/21/openstack-vmware-cloud-computing.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="클라우드 컴퓨팅, OpenStack 메모"/>
+  <meta name="twitter:description" content="OpenStack 커뮤니티가 private 클라우드의 성장을 방해하고 있다는 Matt Asay의 2015년 1월 20일 글 클라우드라는 말이 뉴스에 등장한지 오래되었지만, 기업에서 클라우드를 사용하는 비중은 표면에 scratch 를 내는 정도에 불과하다. 2014년 기업용 IT시장..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>클라우드 컴퓨팅, OpenStack 메모</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">클라우드 컴퓨팅, OpenStack 메모</h1>
+    <p class="post-meta"><time datetime="2015-02-21T18:27:00+09:00" itemprop="datePublished">2015-02-21</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="openstack-커뮤니티가-private-클라우드의-성장을-방해하고-있다는-matt-asay의-2015년-1월-20일-글"><a href="http://www.techrepublic.com/article/openstacks-community-is-hijacking-its-enterprise-future/">OpenStack 커뮤니티가 private 클라우드의 성장을 방해하고 있다는 Matt Asay의 2015년 1월 20일 글</a></h3>
+
+<ul>
+  <li>클라우드라는 말이 뉴스에 등장한지 오래되었지만, 기업에서 클라우드를 사용하는 비중은 표면에 scratch 를 내는 정도에 불과하다.
+    <ul>
+      <li>2014년 기업용 IT시장 크기가 300조원이었는데 클라우드는 5%를 차지했다. <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a></li>
+      <li>OpenStack 은 private cloud 를 지나치게 복잡하게 만드는 방향으로 움직이고 있다.</li>
+      <li>이것은 업계를 진보하는게 아니라 후퇴하게 만들고 있다.</li>
+      <li>클라우드의 장점은 편리함이다. (비용이 아니라.)</li>
+      <li>번거로운 절차 없이 확장 가능한 애플리케이션을 만들 수 있는 유연한 방법을 개발자에게 주는 것이다.</li>
+    </ul>
+  </li>
+  <li>OpenStack 엔지니어의 수요는 많은데 공급은 적다. <a href='#fn:2' class='footnote' id='fnref:2'>[2]</a> (그래서 인건비가 올라간다.)
+    <ul>
+      <li>Red Hat이 지원하는 IDG의 연구에 따르면, 기업들은 OpenStack 을 production 환경에 이용하는 쪽으로 움직이고 있다. <a href='#fn:3' class='footnote' id='fnref:3'>[3]</a></li>
+      <li>이러한 움직임의 가장 큰 이유는, 기술 혁신을 위한 탐구(quest for greater innovation) 인 것 같다.</li>
+      <li>2014년 11월의 OpenStack survey 에 따르면 OpenStack 을 채택하는 가장 큰 이유는 이것이 “혁신의 능력(the ability to innovate)” 을 높인다고 믿기 때문이다. <a href='#fn:4' class='footnote' id='fnref:4'>[4]</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="openstack-이론-vs-현실">OpenStack 이론 vs. 현실</h4>
+
+<ul>
+  <li>만약 이론대로 현실에서도 적용되면 참 좋겠지만.</li>
+  <li>현실에서의 OpenStack 은 여전히 엄청나게 복잡한 것으로 남아있다.</li>
+  <li>Cloudscaling의 Randy Bias 만큼 OpenStack 에 대해 아는 사람은 없을 것이다.
+    <ul>
+      <li>그는 OpenStack 의 초기 개척자 중 한명이고, OpenStack Foundation 설립 멤버였다.</li>
+      <li>Bias가 “OpenStack 은 자기 자신의 무게를 못이겨 스스로 무너질 위험이 있다” 라고 경고하는 것 <a href='#fn:5' class='footnote' id='fnref:5'>[5]</a> 에 대해 OpenStack을 사용하는 사람들은 귀를 기울여야 한다.</li>
+      <li>Bias의 최근 글을 요약하면</li>
+      <li>OpenStack 은 커뮤니티 안에서 다양한 이해관계를 조화시키는 방법을 찾고 있지만, 정말로 필요한 것은 “제품 관리와 제품 전략 리더십” 이다.</li>
+    </ul>
+  </li>
+  <li>이러한 리더십이 없으면, 기업에서 OpenStack을 도입하려고 했던 David (Packet 의 인프라 조직장) 처럼, 기업이 클라우드에 기대하고 있는 편리함을 커뮤니티가 제공하기는 힘들다는 것을 배우게 될 것이다. <a href='#fn:6' class='footnote' id='fnref:6'>[6]</a>
+    <blockquote>
+      <p>한 달이 지나서 내가 읽은 대량의 문서들이 날짜가 지난 정보이거나 부정확하다는 것을 알게 되었다. 그래서 문서, 위키, irc, 커밋 메시지를 선별하면서 진실을 찾아야 했다. 기본이 된 이후에는, 많은 시간을 Python 디버깅에 썼다. “X는 동작하는가?” 를 증명하기 위해 오랜 시간 동안 디버깅을 해야 했고, 이것은 정말 느린 작업이었다.</p>
+    </blockquote>
+  </li>
+</ul>
+
+<h3 id="vmware-의-최근-움직임">VMware 의 최근 움직임</h3>
+
+<ul>
+  <li>2014-04-02 Private Cloud 에 관한 설문조사 결과에서 VMware의 상용 솔루션이 1위이고, OpenStack 이 2위이다. <a href='#fn:7' class='footnote' id='fnref:7'>[7]</a></li>
+  <li>2015-02-03 VMware는 vSphere 6 를 발표했다. <a href='#fn:8' class='footnote' id='fnref:8'>[8]</a>
+    <ul>
+      <li>Docker 만큼의 속도로 몇초만에 프로비저닝 가능하게 하는 “Instant Clone” 기능</li>
+      <li>자료에는 1개의 호스트에 64개의 VM을 프로비전하는데 under 6초로 수행한다고 적혀있다.</li>
+      <li>VM을 복제해서 새로운 VM을 아주 빠르게 올릴 수 있다고 함.</li>
+      <li>고가용성을 위한 새로운 기능으로, Long-Distance vMotion 기능.</li>
+    </ul>
+  </li>
+  <li>2015-02-02 VMware Integrated OpenStack 를 발표함. <a href='#fn:9' class='footnote' id='fnref:9'>[9]</a>
+    <ul>
+      <li>VMware가 만든 OpenStack 배포판</li>
+      <li>VMware 기능을 OpenStack API 로 사용할 수 있음.</li>
+      <li>e.g. Neutron 으로 네트워크 기능을 사용할 수 있다.</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="http://news.investors.com/technology/011615-735080-amazon-aws-leads-in-cloud-msft-googl-crm-rising.htm">http://news.investors.com/technology/011615-735080-amazon-aws-leads-in-cloud-msft-googl-crm-rising.htm</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:2" id="fn:2" class="reversefootnote">[2]</a>:
+    </span>
+    <span class="content"><a href="http://www.infoworld.com/article/2842618/cloud-computing/openstack-users-we-need-more-experienced-staff.html">http://www.infoworld.com/article/2842618/cloud-computing/openstack-users-we-need-more-experienced-staff.html</a> <a href="#fnref:2" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:3" id="fn:3" class="reversefootnote">[3]</a>:
+    </span>
+    <span class="content"><a href="http://www.redhat.com/files/resources/en-opst-idg-openstack-platform-choice-cloud-infographic.pdf">http://www.redhat.com/files/resources/en-opst-idg-openstack-platform-choice-cloud-infographic.pdf</a> <a href="#fnref:3" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:4" id="fn:4" class="reversefootnote">[4]</a>:
+    </span>
+    <span class="content"><a href="http://superuser.openstack.org/articles/openstack-user-survey-insights-november-2014">http://superuser.openstack.org/articles/openstack-user-survey-insights-november-2014</a> <a href="#fnref:4" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:5" id="fn:5" class="reversefootnote">[5]</a>:
+    </span>
+    <span class="content"><a href="http://www.cloudscaling.com/blog/openstack/the-future-of-openstack-is-now-2015/">http://www.cloudscaling.com/blog/openstack/the-future-of-openstack-is-now-2015/</a> <a href="#fnref:5" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:6" id="fn:6" class="reversefootnote">[6]</a>:
+    </span>
+    <span class="content"><a href="https://www.packet.net/blog/how-we-failed-at-openstack">우리가 4개월 동안 한 작업을 쓰레기통에 던진 이유; 우리의 OpenStack 실패기</a> <a href="#fnref:6" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:7" id="fn:7" class="reversefootnote">[7]</a>:
+    </span>
+    <span class="content"><a href="http://www.rightscale.com/blog/cloud-industry-insights/cloud-computing-trends-2014-state-cloud-survey">http://www.rightscale.com/blog/cloud-industry-insights/cloud-computing-trends-2014-state-cloud-survey</a> <a href="#fnref:7" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:8" id="fn:8" class="reversefootnote">[8]</a>:
+    </span>
+    <span class="content"><a href="http://www.vmware.com/company/news/releases/vmw-newsfeed/Introducing-VMware-vSphere-6---The-Foundation-for-Hybrid-Cloud/1920294">http://www.vmware.com/company/news/releases/vmw-newsfeed/Introducing-VMware-vSphere-6—The-Foundation-for-Hybrid-Cloud/1920294</a> <a href="#fnref:8" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:9" id="fn:9" class="reversefootnote">[9]</a>:
+    </span>
+    <span class="content"><a href="http://blogs.vmware.com/openstack/2015/02/02/vmware-integrated-openstack-arrives/">http://blogs.vmware.com/openstack/2015/02/02/vmware-integrated-openstack-arrives/</a> <a href="#fnref:9" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>

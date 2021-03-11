@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  
+  
+  
+  
+
+  <meta name="title"       content="&quot;Rails 이제 안 써&quot; 를 읽고" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="며칠전 solnic이 rails를 더이상 쓰지 않는 이유를 썼다. [1] 이 글과 관련 토론을 최근 재밌게 읽었다. 그리고 내 느낀점만 짧게 남겨야 겠다고 생각했다. 일단 나는 ruby와 rails를 좋아한다. 그리고 solnic의 rails에 대한 비판에 공감하는 부분이 많다. ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="&quot;Rails 이제 안 써&quot; 를 읽고"/>
+  <meta name="og:description"  content="며칠전 solnic이 rails를 더이상 쓰지 않는 이유를 썼다. [1] 이 글과 관련 토론을 최근 재밌게 읽었다. 그리고 내 느낀점만 짧게 남겨야 겠다고 생각했다. 일단 나는 ruby와 rails를 좋아한다. 그리고 solnic의 rails에 대한 비판에 공감하는 부분이 많다. ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2016/06/14/ruby-rails-solnic.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="&quot;Rails 이제 안 써&quot; 를 읽고"/>
+  <meta name="twitter:description" content="며칠전 solnic이 rails를 더이상 쓰지 않는 이유를 썼다. [1] 이 글과 관련 토론을 최근 재밌게 읽었다. 그리고 내 느낀점만 짧게 남겨야 겠다고 생각했다. 일단 나는 ruby와 rails를 좋아한다. 그리고 solnic의 rails에 대한 비판에 공감하는 부분이 많다. ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>&quot;Rails 이제 안 써&quot; 를 읽고</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a href="/" title="sangwook">
+      <span style="background-image: url('https://avatars0.githubusercontent.com/u/123514?s=100'); width:100px; height:100px; display:block;">
+      </span>
+    </a>
+
+    <div class="about-desc">
+      이상욱,
+      scott,
+      ISFP,
+      <a href="https://www.facebook.com/2sangwook">facebook</a>,
+      <a href="https://twitter.com/yiisw">twitter</a>,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">&quot;Rails 이제 안 써&quot; 를 읽고</h1>
+    <p class="post-meta"><time datetime="2016-06-14T23:31:00+09:00" itemprop="datePublished">2016-06-14</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <ul>
+  <li>며칠전 solnic이 rails를 더이상 쓰지 않는 이유를 썼다. <a href='#fn:1' class='footnote' id='fnref:1'>[1]</a>
+    <ul>
+      <li>이 글과 관련 토론을 최근 재밌게 읽었다.</li>
+      <li>그리고 내 느낀점만 짧게 남겨야 겠다고 생각했다.</li>
+    </ul>
+  </li>
+  <li>일단 나는 ruby와 rails를 좋아한다.</li>
+  <li>그리고 solnic의 rails에 대한 비판에 공감하는 부분이 많다.</li>
+  <li>solnic의 글은 한 마디로 Rails의 tight-coupling 을 지적하고 있다.</li>
+  <li>좀 더 자세히는 Rails 에 대해 아래 3가지를 비판하고 있다고 생각한다.
+    <ol>
+      <li>매우 복잡한 로직을 “쉬운” 인터페이스 뒤에 숨긴다.</li>
+      <li>앱의 도메인 로직들이 Rails core features 에 tight-coupling 된다.</li>
+      <li>ActiveSupport 는 나쁘다.</li>
+    </ol>
+  </li>
+  <li>지적에 공감하지만 나는 여전히 Rails가 좋다.</li>
+  <li>그리고 오히려 Rails의 장점으로 생각하는 부분이 있다.</li>
+  <li>solnic 은 <code class="highlighter-rouge">User.create(params[:user])</code>
+    <ul>
+      <li>이 코드가 “쉬운 인터페이스 뒤에 복잡한 로직이 숨겨져 있다.” 고 지적한다.</li>
+      <li>Rails의 ORM인 ActiveRecord는 지적한 데로
+        <ul>
+          <li>매우 많은 일을 하고,</li>
+          <li>여러곳에 의존하고,</li>
+          <li>심지어 web form 데이터 까지 AR에 전달한다.</li>
+        </ul>
+      </li>
+      <li>결벽스러운 소프트웨어 공학자들이 비명을 지를 것이다.</li>
+      <li>domain logic과 framework가 loose-coupling 할 수록 더 좋은 소프트웨어가 맞다.</li>
+      <li>하지만 (내가 이해하는) Rails way 는 loose-coupling 을 지향하지 않는다.</li>
+      <li>Rails 는 simple 보다 ease-of-use 를 지향한다.
+        <ul>
+          <li>(tight-coupling 한 결정이라도, 그것이 쉽고 편하다면 Rails는 그것을 선택한다.)</li>
+        </ul>
+      </li>
+      <li>물론 나도 simple 한 모듈들을 조합하는 방식이 이상적이라고 생각한다.</li>
+      <li>하지만 매우 loose-coupling 하고, 모듈화된 프레임워크가 장점만 있지 않았다.
+        <ul>
+          <li>프로그래머 별로 조합하는 방식에 일관성이 없고,</li>
+          <li>여러사람의 손을 거치면 오히려 복잡해지고, 유지보수가 힘들었다.</li>
+        </ul>
+      </li>
+      <li>그래서 나는 Rails way 를 좋아하고, 개인 프로젝트는 Rails 를 사용한다.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">User.create</code> 는 framework 와 내가 만드는 app 사이의 (일종의) API 이다.
+    <ul>
+      <li>API가 사용하기 쉽고, 내부에 복잡한 일을 한다는 건 중요한 문제가 아니라고 생각한다.</li>
+      <li>DB엔진 내부가 복잡하고 자세히 몰라도 우리는 SQL 이라는 인터페이스로 쉽게 조회를 한다.</li>
+      <li>문이 어떻게 열리는지 내부 구조를 몰라도 우리는 손잡이를 돌려 문을 연다.</li>
+    </ul>
+  </li>
+  <li>중요한 문제는 내부 구조를 확장할 정도로 내가 만드는 앱이 복잡해졌을 때 이다.
+    <ul>
+      <li>예를 들면 MySQL 의 내부구조를 전혀 모르고 SQL 인터페이스로 사용만 해오다가.
+        <ul>
+          <li>SELECT 문에 특정 기능을 추가해야 한다면?</li>
+          <li>MySQL 내부구조를 연구해서, 쪼개고, 직접 수정할 것인가?</li>
+          <li>Rails 는 이러한 상황에 우아한 해결책을 주는가?</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>내 생각에도 Rails 는 이것을 고려해서 만들지도, 또 중요하게 생각하지 않는 것 같다.</li>
+  <li>내 경험에 한정하면
+    <ul>
+      <li>Rails의 내부 구조를 쪼개서 기능 변경을 해야할 정도로 비즈니스 로직이 복잡해 진다면.</li>
+      <li>일단 내 설계를 의심해왔고, 해결되지 않는 문제는 아직 없었다.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">ActiveRecord.suppress</code> 와 <code class="highlighter-rouge">ActiveSupport</code> 는 나쁜 접근이라는 점에 동의한다.
+    <ul>
+      <li>나도 가능한 안 써야 한다고 생각한다.</li>
+      <li>(다들 쓴다는 점에서 조금 우울하지만…)</li>
+    </ul>
+  </li>
+  <li>나는 무엇보다 사용자가 필요한 기능을 빨리 만들고 변경하는 것을 중요하게 생각한다.
+    <ul>
+      <li>MVC, SOLID, 디자인 패턴, DDD 등에 의해 완벽한 소프트웨어를 만드는건 나중에 해도 된다.
+        <ul>
+          <li>이런건 학교에서 열심히 연구하자.</li>
+        </ul>
+      </li>
+      <li>나는 quick and dirty 로 사용자가 원하는 것을 구현하고 나중에 리팩토링 하는 길을 선호한다.
+        <ul>
+          <li>quick and dirty 에 최적화된 언어는 PHP 이다.</li>
+          <li>그게 Facebook, Tumblr 등이 성공한 이유다.</li>
+          <li>하지만 PHP는 더러운 코드가 유지될 가능성이 높다는 결정적인 단점이 있다.</li>
+        </ul>
+      </li>
+      <li>그런 면에서 Rails 를 사용하며 만족하고 있다.</li>
+    </ul>
+  </li>
+  <li>사실 Rails 를 쓰는 가장 큰 이유는 테스트 코드 작성이 쉽다는 점이다.
+    <ul>
+      <li>난 Java 진영에서 직업으로서의 프로그래밍을 오랫동안 해오면서
+        <ul>
+          <li>Java 로 작성된 제대로된 테스트 코드를 본 적이 없다.</li>
+        </ul>
+      </li>
+      <li>사람들은 쉬우면 하고 어려우면 하지 않는다.</li>
+      <li>대중은 어려운 방향으로 수렴하지 않는다.</li>
+      <li>테스트 코드 없이는 리팩토링도, 반복된 로직을 줄이는 일도 매우 어렵다.</li>
+    </ul>
+  </li>
+  <li>(한 발 더 나가,
+    <ul>
+      <li>요즘엔 테스트 코드 작성과 기존 로직의 “변경”이 어려운 언어/프레임워크를 쓰는 서비스는 실패한다는 편견도 생겼다.)</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="footnotes">  <ol>    <li>
+  <div>
+    <span class="num">
+      <a href="#fnref:1" id="fn:1" class="reversefootnote">[1]</a>:
+    </span>
+    <span class="content"><a href="http://solnic.eu/2016/05/22/my-time-with-rails-is-up.html">http://solnic.eu/2016/05/22/my-time-with-rails-is-up.html</a> <a href="#fnref:1" class="reversefootnote"><span class="return">&#91;return&#93;</span></a></span>
+  </div>
+</li>
+  </ol></div>
+  </div>
+  
+</article>
+
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        ISFP,
+        <a href="https://www.facebook.com/2sangwook">facebook</a>,
+        <a href="https://twitter.com/yiisw">twitter</a>,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://open.kakao.com/o/sUbQmYl">카카오톡</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+  </body>
+</html>
