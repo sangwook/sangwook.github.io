@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="Docker 로 Heroku 에 배포하기" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했습니다 (heroku). 요즘 회사에서 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷한) 를 만들고 있고, Docker 에도 관심이 많아서 한 번 살펴 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Docker 로 Heroku 에 배포하기"/>
+  <meta name="og:description"  content="며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했습니다 (heroku). 요즘 회사에서 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷한) 를 만들고 있고, Docker 에도 관심이 많아서 한 번 살펴 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2015/05/08/docker-heroku.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Docker 로 Heroku 에 배포하기"/>
+  <meta name="twitter:description" content="며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했습니다 (heroku). 요즘 회사에서 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷한) 를 만들고 있고, Docker 에도 관심이 많아서 한 번 살펴 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Docker 로 Heroku 에 배포하기</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Docker 로 Heroku 에 배포하기</h1>
+    <p class="post-meta"><time datetime="2015-05-08T12:55:00+09:00" itemprop="datePublished">2015-05-08</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><img src="/assets/2015/150508-7125e6bbea1a644561eead81097e3518-tumblr_inline_no0iu5Ur9j1r7z9vf_540-39ed6afa5775189639bc0995d6f24b27d482eb82bf6b546c514739b153f68cfb.jpg" alt="이미지"></p>
+<p>며칠 전 5월 5일, 유명 PaaS 인 Heroku 가 Docker 로 배포하는 도구를 발표했습니다 (<a href="https://blog.heroku.com/archives/2015/5/5/introducing_heroku_docker_release_build_deploy_heroku_apps_with_docker" target="_blank" rel="noopener">heroku</a>). 요즘 회사에서 사내 개발자들을 위한 PaaS (Heroku 또는 AWS Beanstalk 와 비슷한) 를 만들고 있고, Docker 에도 관심이 많아서 한 번 살펴봤습니다. 제가 안 하면 아무도 안 해 줄 것 같기도 했습니다.</p>
+<p>살펴본 결론은 이렇습니다. 우선 아무 Docker 이미지나 Heroku 에 올려서 돌릴 수 있는 것은 아닙니다. Heroku 가 자동으로 만들어 주는 Dockerfile 을 사용하거나, <code>FROM heroku/cedar:14</code> 이미지를 사용해야 Heroku에 올릴 수 있습니다. <code>/app</code> 아래에 파일들이 들어가야 한다는 조건도 있습니다. 그리고 <code>ONBUILD</code> 로 코드를 이미지에 포함시키기 때문에, 소스코드를 수정하면 <code>heroku docker:start</code> 를 다시 해 주어야 합니다. 개발용으로 volume mount 를 하는 등의 다른 방법이 분명 있을 것입니다.</p>
+<p>장점은 (제 생각에) 앱에 있는 바이너리 의존성, 예를 들어 imagemagick 같은 것을 buildpack 방식에서는 복잡하게 해결해야 했는데, Docker 방식에서는 단순히 Dockerfile 에 의존성을 추가하고 PATH 를 추가하면 된다는 점입니다.</p>
+<h3 id="heroku-docker-설치">heroku-docker 설치</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku plugins:install heroku-docker
+</code></pre>
+</div>
+<h3 id="샘플-앱-clone">샘플 앱 clone</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ git clone https://github.com/heroku/node-js-getting-started.git
+$ cd node-js-getting-started
+</code></pre>
+</div>
+<h3 id="dockerinit---현재-디렉터리의-언어에-따라-dockerfile-생성">docker:init - 현재 디렉터리의 언어에 따라 Dockerfile 생성</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:init
+  Wrote Dockerfile (node)
+
+$ cat Dockerfile
+  FROM heroku/cedar:14
+
+  RUN useradd -d /app -m app
+  USER app
+  WORKDIR /app
+
+  ENV HOME /app
+  ENV NODE_ENGINE 0.12.2
+  ENV PORT 3000
+
+  RUN mkdir -p /app/heroku/node
+  RUN curl -s https://s3pository.heroku.com/node/v$NODE_ENGINE/node-v$NODE_ENGINE-linux-x64.tar.gz | tar --strip-components=1 -xz -C /app/heroku/node
+  ENV PATH /app/heroku/node/bin:$PATH
+
+  RUN mkdir -p /app/.profile.d
+  RUN echo "export PATH=\"/app/heroku/node/bin:/app/bin:/app/node_modules/.bin:\$PATH\"" &gt; /app/.profile.d/nodejs.sh
+  RUN echo "cd /app/src" &gt;&gt; /app/.profile.d/nodejs.sh
+
+  EXPOSE 3000
+
+  ONBUILD RUN mkdir -p /app/src
+  ONBUILD COPY . /app/src
+  ONBUILD WORKDIR /app/src
+  ONBUILD RUN npm install
+</code></pre>
+</div>
+<h3 id="dockerinit-내부-구현">docker:init 내부 구현</h3>
+<p><code>docker:init</code> 은 buildpack 과 동일한 방식으로 언어를 detect 합니다. 예를 들어 <code>package.json</code> 가 존재하면 Node.js 로 detect 합니다 (<a href="https://github.com/heroku/heroku-docker/blob/master/commands/init.js#L27" target="_blank" rel="noopener">github</a>). 구현은 <a href="https://github.com/heroku/heroku-docker/blob/master/commands/init.js#L38" target="_blank" rel="noopener">platforms.detect(dir)</a> 와 <a href="https://github.com/heroku/heroku-docker/blob/master/platforms/node/index.js#L11-L12" target="_blank" rel="noopener">fs.writeFileSync(dockerfile, contents)</a> 부분에서 볼 수 있습니다. 현재 지원되는 언어는 <a href="https://github.com/heroku/heroku-docker/tree/master/platforms" target="_blank" rel="noopener">node, python, ruby, scala</a> 입니다. <code>heroku docker:init --template minimal</code> 으로 최소한의 Dockerfile 을 만들 수 있고, 여기서 생성되는 <a href="https://github.com/heroku/heroku-docker/blob/master/platforms/minimal/Dockerfile.t" target="_blank" rel="noopener">Dockerfile</a> 이 minimal 템플릿입니다.</p>
+<h3 id="herokucedar14-도커-이미지-내부-구현">heroku/cedar:14 도커 이미지 내부 구현</h3>
+<p>이미지는 <a href="https://registry.hub.docker.com/u/heroku/cedar/" target="_blank" rel="noopener">Docker Registry</a> 에 올라가 있습니다. Cedar-14 는 ubuntu 14.04 LTS 를 기반으로 한 스택이고, 설치되는 <a href="https://devcenter.heroku.com/articles/cedar-ubuntu-packages" target="_blank" rel="noopener">ubuntu package 목록</a> 도 따로 정리되어 있습니다.</p>
+<p>Dockerfile 은 아래와 같이 단순합니다 (<a href="https://github.com/tt/stack-images/blob/master/Dockerfile" target="_blank" rel="noopener">github</a>).</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>FROM ubuntu-debootstrap:14.04
+COPY ./bin/cedar-14.sh /tmp/build.sh
+RUN LC_ALL=C DEBIAN_FRONTEND=noninteractive /tmp/build.sh \
+  &amp;&amp; rm -rf /var/lib/apt/lists/*
+</code></pre>
+</div>
+<p>ubuntu-debootstrap 은 <a href="https://registry.hub.docker.com/_/ubuntu-debootstrap/" target="_blank" rel="noopener">Docker Registry</a> 에 있고, <a href="https://github.com/docker-library/official-images/blob/master/library/ubuntu-debootstrap" target="_blank" rel="noopener">공식 이미지 목록</a> 에서 github.com/tianon/docker-brew-ubuntu-debootstrap 여기에 Dockerfile 이 있다는 것을 알 수 있습니다. 실제 <a href="https://github.com/tianon/docker-brew-ubuntu-debootstrap/blob/dist/14.04/Dockerfile" target="_blank" rel="noopener"><code>ubuntu-debootstrap:14.04</code> 의 Dockerfile</a> 은 링크에서 볼 수 있습니다.</p>
+<p>즉 <code>heroku/cedar:14</code> 는 용량이 작은 최소한의 ubuntu docker image 에 <a href="https://github.com/tt/stack-images/blob/master/bin/cedar-14.sh" target="_blank" rel="noopener">cedar-14.sh</a> 를 실행시킨 것입니다.</p>
+<h3 id="dockerstart---로컬에-컨테이너를-시작">docker:start - 로컬에 컨테이너를 시작</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:start
+  building image...
+  Sending build context to Docker daemon 285.2 kB
+  Sending build context to Docker daemon
+  Step 0 : FROM heroku/cedar:14
+  Pulling repository heroku/cedar
+  66766a8c5395: Download complete
+  c40496787f7c: Download complete
+  f90b0e99841d: Download complete
+  ac0bf528748f: Download complete
+  Status: Downloaded newer image for heroku/cedar:14
+   ---&gt; 66766a8c5395
+  ... docker 이미지 빌드 생략 ...
+  Successfully built d3e547511a82
+
+  starting container...
+  web process will be available at http://localhost:3000/
+  Node app is running on port 3000
+</code></pre>
+</div>
+<h3 id="dockerstart-내부-구현">docker:start 내부 구현</h3>
+<p><a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/start.js#L38" target="_blank" rel="noopener">start.js</a> 가 핵심입니다. Procfile 을 읽어서 여기에 적혀 있는 command 가 Docker 가 실행될 때 command 로 전달됩니다. <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L49" target="_blank" rel="noopener">docker.ensureStartImage</a> 가 <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L54" target="_blank" rel="noopener">ensureStartImage()</a> 와 <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/start.js#L31" target="_blank" rel="noopener">buildImage</a> 를 호출합니다. 빌드 명령은 <code>build --force-rm --file="${dockerfile}" --tag="${id}" "${dir}"</code> 입니다. 실행은 <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L96" target="_blank" rel="noopener">runImage()</a> 에서 <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L61" target="_blank" rel="noopener"><code>run -w /app/src -p 3000:3000 --rm -it ${mountComponent} ${envArgComponent} ${imageId} sh -c "${command}" || true</code></a> 형태로 수행합니다.</p>
+<h3 id="컨테이너에-명령-실행">컨테이너에 명령 실행</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:exec npm install --save --no-bin-links cool-ascii-faces
+$ heroku docker:exec ls node_modules
+</code></pre>
+</div>
+<h3 id="dockerexec-내부-구현">docker:exec 내부 구현</h3>
+<p><code>docker exec</code> 를 한 번 감싼 형태입니다. 구현은 <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/exec.js#L22" target="_blank" rel="noopener">exec.js</a> 와 <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/lib/docker.js#L49" target="_blank" rel="noopener">runImage()</a> 에서 볼 수 있습니다.</p>
+<h3 id="dockerrelease---배포">docker:release - 배포</h3>
+<p>아래의 명령으로 배포 가능합니다.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ heroku docker:release
+</code></pre>
+</div>
+<p>이것은 heroku 가 기존에 사용하던 Buildpack 기반의 빌드시스템을 사용하지 않습니다. 대신, Docker 이미지에 앱의 코드와 의존성을 포함하고, 로컬의 Docker 이미지를 직접 배포합니다.</p>
+<h3 id="dockerrelease-내부-구현">docker:release 내부 구현</h3>
+<p>Heroku 로 배포할 때 컨테이너를 올려서 <code>/app</code> 디렉터리를 압축합니다. 이 압축파일에는 language 의 runtime 과 앱의 소스코드를 포함합니다.</p>
+<p>구체적으로는 <a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/release.js#L25" target="_blank" rel="noopener">release.js</a> 에서 아래의 흐름을 따릅니다.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>docker run -d ${imageId} tar cfvz /tmp/slug.tgz -C / --exclude=.git --exclude=.heroku ./app
+docker wait ${containerId}
+docker cp ${containerId}:/tmp/slug.tgz ${slugPath}
+docker rm -f ${containerId}
+slug.tgz
+</code></pre>
+</div>
+<p>만들어진 slug 압축파일을 HTTP PUT 을 통해 업로드하도록 구현되어 있습니다 (<a href="https://github.com/heroku/heroku-docker/blob/f51d17601d997322a8d75f07d53afaa3b19a40b1/commands/release.js#L74-L82" target="_blank" rel="noopener">github</a>, <a href="https://devcenter.heroku.com/articles/platform-api-deploying-slugs" target="_blank" rel="noopener">heroku</a>).</p>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

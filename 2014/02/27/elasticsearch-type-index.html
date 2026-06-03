@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="각각의 index에 각각의 type을 저장: 인덱스 내에서 검색이 효과적이고 빠릅니다. 데이터량은 각 샤드 내에서 작아야 합니다. 2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있습니다. 쿼리가 각 인덱스의 샤드들로 보내지고, 다시 결과를 합쳐서 사용자에게 보내야 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type"/>
+  <meta name="og:description"  content="각각의 index에 각각의 type을 저장: 인덱스 내에서 검색이 효과적이고 빠릅니다. 데이터량은 각 샤드 내에서 작아야 합니다. 2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있습니다. 쿼리가 각 인덱스의 샤드들로 보내지고, 다시 결과를 합쳐서 사용자에게 보내야 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/02/27/elasticsearch-type-index.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type"/>
+  <meta name="twitter:description" content="각각의 index에 각각의 type을 저장: 인덱스 내에서 검색이 효과적이고 빠릅니다. 데이터량은 각 샤드 내에서 작아야 합니다. 2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있습니다. 쿼리가 각 인덱스의 샤드들로 보내지고, 다시 결과를 합쳐서 사용자에게 보내야 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">ElasticSearch: 1 index 여러 type vs. 여러 index에 각 type</h1>
+    <p class="post-meta"><time datetime="2014-02-27T10:31:00+09:00" itemprop="datePublished">2014-02-27</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="각각의-index에-각각의-type을-저장">각각의 index에 각각의 type을 저장:</h3>
+<p>인덱스 내에서 검색이 효과적이고 빠릅니다. 데이터량은 각 샤드 내에서 작아야 합니다. 2개 이상의 인덱스의 데이터를 조합해서 검색하는 것은 오버헤드가 있습니다. 쿼리가 각 인덱스의 샤드들로 보내지고, 다시 결과를 합쳐서 사용자에게 보내야 하기 때문입니다.</p>
+<p>만약 데이터셋이 작다면 이 방식은 추천하지 않습니다. 미미한 성능 향상을 위해 추가적인 샤드와 더 많은 스토리지가 필요해지기 때문입니다. 반대로 데이터셋이 크고 쿼리가 오래 걸린다면 추천합니다. 독점적인 샤드가 specific 데이터들을 저장하게 되고, 그 덕분에 ES가 처리하기 쉬워지기 때문입니다.</p>
+<h3 id="1개의-index에-여러-type으로-저장">1개의 index에 여러 type으로 저장:</h3>
+<p>1개의 인덱스 안에 있는 5개의 샤드(디폴트) 에 더 많은 데이터가 저장됩니다. 이것은 다른 type 을 조합하는 쿼리를 날릴 때 오버헤드가 적다는 것을 의미합니다. 하지만 샤드 크기가 상당히 커집니다. 샤드가 커진다는 것은 ES가 검색하는 데 더 오래 걸린다는 의미입니다. 필터를 해야 하는 문서가 더 많기 때문입니다.</p>
+<p>만약 1TB 데이터로 성장할 거라면 추천하지 않습니다. 다른 인덱스 또는 여러 샤드에 데이터를 분산하지 않을 거면 역시 추천하지 않습니다. 반대로 데이터가 작다면 추천합니다. 미미한 성능 향상을 위해 스토리지를 낭비하지 않을 것이기 때문입니다.</p>
+<p><a href="http://stackoverflow.com/questions/14465668/elastic-search-multiple-indexes-vs-one-index-and-types-for-different-data-sets" target="_blank" rel="noopener">http://stackoverflow.com/questions/14465668/elastic-search-multiple-indexes-vs-one-index-and-types-for-different-data-sets</a></p>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

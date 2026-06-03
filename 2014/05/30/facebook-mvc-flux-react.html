@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="Facebook: "MVC는 큰 시스템에 어울리지 않는다" React, Flux" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="Facebook: MVC Does Not Scale, Use Flux Instead Facebook이 “MVC는 스케일하지 않는다”라는 결론을 내렸습니다. 확장에 어울리지 않고, 거대한 시스템에는 더더욱 맞지 않는다는 이야기입니다. 이유는 이렇습니다. 새로운 기능을 추가할 때마다 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Facebook: "MVC는 큰 시스템에 어울리지 않는다" React, Flux"/>
+  <meta name="og:description"  content="Facebook: MVC Does Not Scale, Use Flux Instead Facebook이 “MVC는 스케일하지 않는다”라는 결론을 내렸습니다. 확장에 어울리지 않고, 거대한 시스템에는 더더욱 맞지 않는다는 이야기입니다. 이유는 이렇습니다. 새로운 기능을 추가할 때마다 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/05/30/facebook-mvc-flux-react.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Facebook: "MVC는 큰 시스템에 어울리지 않는다" React, Flux"/>
+  <meta name="twitter:description" content="Facebook: MVC Does Not Scale, Use Flux Instead Facebook이 “MVC는 스케일하지 않는다”라는 결론을 내렸습니다. 확장에 어울리지 않고, 거대한 시스템에는 더더욱 맞지 않는다는 이야기입니다. 이유는 이렇습니다. 새로운 기능을 추가할 때마다 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Facebook: "MVC는 큰 시스템에 어울리지 않는다" React, Flux</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Facebook: "MVC는 큰 시스템에 어울리지 않는다" React, Flux</h1>
+    <p class="post-meta"><time datetime="2014-05-30T17:01:00+09:00" itemprop="datePublished">2014-05-30</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="https://www.infoq.com/news/2014/05/facebook-mvc-flux" target="_blank" rel="noopener">Facebook: MVC Does Not Scale, Use Flux Instead</a></p>
+<p>Facebook이 “MVC는 스케일하지 않는다"라는 결론을 내렸습니다. 확장에 어울리지 않고, 거대한 시스템에는 더더욱 맞지 않는다는 이야기입니다.</p>
+<p>이유는 이렇습니다. 새로운 기능을 추가할 때마다 시스템의 복잡도가 기하급수적으로 늘어납니다. 그래서 프로그래머가 “기존 기능에 영향을 주지는 않을까?” 하는 걱정을 하게 되고, 결국 기능을 더하는 일 자체가 두려워집니다. MVC는 작은 앱에는 잘 맞지만, 모델과 뷰의 수가 많아지면 사정이 달라집니다.</p>
+<p><img src="http://www.infoq.com/resource/news/2014/05/facebook-mvc-flux/en/resources/flux-react-mvc.png" alt=""></p>
+<p>모델과 뷰 사이의 데이터 흐름이 양방향으로 일어나기 때문에 복잡도가 폭발적으로 증가하고, 이해하기도 디버깅하기도 어려워집니다. 그래서 Facebook은 MVC와 결별했다고 합니다.</p>
+<p>대안의 목적은 “좀 더 예측 가능하도록 코드를 구조화하는 것"입니다. Facebook은 Flux와 React로 이 목적을 달성했다고 밝힙니다. <a href="http://facebook.github.io/react/docs/flux-overview.html" target="_blank" rel="noopener">Flux</a>는 데이터 흐름이 단방향인 시스템 아키텍처이고, <a href="http://facebook.github.io/react/index.html" target="_blank" rel="noopener">React</a>는 “predictable"하고 “declarative"한 웹 유저 인터페이스를 빠르게 만들기 위한 JavaScript framework입니다.</p>
+<p><img src="http://www.infoq.com/resource/news/2014/05/facebook-mvc-flux/en/resources/flux-react.png" alt=""></p>
+<p>구조를 좀 더 들여다보면 이렇습니다. Store는 앱의 모든 데이터를 저장합니다. MVC의 Model과 다른 점은 하나의 객체 인스턴스가 아니라 여러 객체의 상태를 관리한다는 점입니다. Dispatcher는 Controller의 역할을 합니다. Action이 시작될 때 어떻게 Store가 업데이트되어야 하는지를 결정하는, 모든 데이터를 관리하는 중앙 허브입니다. Store의 콜백이 등록되는 장소라고 이해하면 됩니다. Store가 변경되면 View도 변경됩니다. 데이터는 단방향으로만 흐르고, Store와 View는 서로 직접 영향을 줄 수 없습니다. 중요한 점은 데이터 계층이 자기가 영향을 미치는 view를 업데이트 완료한 다음에야 다른 작업을 진행한다는 것입니다.</p>
+<p>샘플로 <a href="http://facebook.github.io/react/docs/flux-todo-list.html" target="_blank" rel="noopener">Flux TodoMVC Tutorial</a>을 따라가면 과정을 좀 더 자세히 살펴볼 수 있습니다.</p>
+<h3 id="논란">논란</h3>
+<p>위 글이 올라간 뒤로 <a href="http://www.reddit.com/r/programming/comments/25nrb5/facebook_mvc_does_not_scale_use_flux_instead/" target="_blank" rel="noopener">Reddit에는 수많은 논쟁</a>이 벌어졌습니다. 재미있게 본 코멘트들을 옮겨 둡니다.</p>
+<p>Facebook이 MVC를 잘못 이해하고 있다는 의견이 있습니다. 정통 MVC는 <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/MVC-Process.svg/500px-MVC-Process.svg.png" alt=""> 이런 모양인데, Facebook은 아마도 여러 모델을 컨트롤하는 데 하나의 컨트롤러를 쓰려고 시도했을 거라는 추측입니다.</p>
+<p>이것이 MVC에 새 이름을 붙인 것일 뿐이라는 의견도 있습니다. MVC를 조금만 변형해서 이벤트 기반 형태로 만든 것이라는 분석입니다. Store가 자신과 호출 순서의 의존성을 콜백 형태로 Dispatcher에 등록하고, Dispatcher는 호출 순서를 보장하면서 작업을 처리하는 역할을 합니다. 결국 Controller의 역할을 Dispatcher와 Store가 나누어 맡게 된 형태로 볼 수 있다는 이야기입니다.</p>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

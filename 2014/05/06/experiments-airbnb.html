@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="Airbnb의 A/B 테스트 실험" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="“Experiments at Airbnb - Airbnb Engineering” 테크 토크를 보고 배운 내용을 정리합니다. 새로운 기능을 추가할 때 A/B 테스트를 합니다. 기존 기능을 쓰는 사용자 그룹과 새 기능을 쓰는 그룹을 비교하고, p-value가 0.05보다 작은지를 확인 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Airbnb의 A/B 테스트 실험"/>
+  <meta name="og:description"  content="“Experiments at Airbnb - Airbnb Engineering” 테크 토크를 보고 배운 내용을 정리합니다. 새로운 기능을 추가할 때 A/B 테스트를 합니다. 기존 기능을 쓰는 사용자 그룹과 새 기능을 쓰는 그룹을 비교하고, p-value가 0.05보다 작은지를 확인 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/05/06/experiments-airbnb.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Airbnb의 A/B 테스트 실험"/>
+  <meta name="twitter:description" content="“Experiments at Airbnb - Airbnb Engineering” 테크 토크를 보고 배운 내용을 정리합니다. 새로운 기능을 추가할 때 A/B 테스트를 합니다. 기존 기능을 쓰는 사용자 그룹과 새 기능을 쓰는 그룹을 비교하고, p-value가 0.05보다 작은지를 확인 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Airbnb의 A/B 테스트 실험</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Airbnb의 A/B 테스트 실험</h1>
+    <p class="post-meta"><time datetime="2014-05-06T21:01:00+09:00" itemprop="datePublished">2014-05-06</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="http://nerds.airbnb.com/experiments-airbnb/" target="_blank" rel="noopener">“Experiments at Airbnb - Airbnb Engineering”</a> 테크 토크를 보고 배운 내용을 정리합니다.</p>
+<iframe width="560" height="315" src="//www.youtube.com/embed/lVTIcf6IhY4" frameborder="0" allowfullscreen></iframe>
+<p>새로운 기능을 추가할 때 A/B 테스트를 합니다. 기존 기능을 쓰는 사용자 그룹과 새 기능을 쓰는 그룹을 비교하고, p-value가 0.05보다 작은지를 확인합니다.</p>
+<p>예를 들어 검색 기능의 가격 범위 폭을 $300에서 $1,100으로 바꾼 실험이 있었습니다. 초기에는 예약률이 4% 증가했고 p-value도 0.05 이하로 떨어졌습니다. 그런데 시간이 지나면서 예약률 증가폭이 0%에 가까워지고 p-value도 0.4까지 올라갔습니다.</p>
+<p>이렇게 A/B 테스트 결과가 시간에 따라 달라지는 일은 자주 발생합니다. 새로운 기능이 나오면 일단 한번 써 보자는 사용자가 있어서 전환율과 p-value에 영향을 주기 때문입니다.</p>
+<p>따라서 p-value가 0.05 이하라고 곧바로 A/B 테스트를 중단하는 것은 경솔한 판단입니다. p-value가 시간이 흘러도 흔들리지 않고 안정되어 있는지를 함께 확인해야 합니다.</p>
+<p>A/B 테스트 결과를 검증할 때는 로그도 함께 봐야 합니다. 부정적인 결과가 나왔는데 알고 보니 특정 브라우저의 버그가 원인이었던 사례가 있었다고 합니다.</p>
+<p>2014.05.28 추가: <a href="http://nerds.airbnb.com/experiments-at-airbnb/" target="_blank" rel="noopener">AirBnb 개발자 블로그에 문서로 올라왔네요.</a></p>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

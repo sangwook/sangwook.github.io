@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="데이터 마이닝을 공부하면서 드는 생각" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="업무에서 실제로 자주 쓰게 되는 건, “CVR 향상에 가장 크게 기여하는 행동 패턴”을 찾아내는 일인 듯합니다. 어떤 사용자가 어떤 행동을 했는지 여부를 플래그로 만들어 한 테이블에 정리하고, 이 사용자의 CV 여부를 yes/no 로 분류해 둡니다. 예를 들면 이런 모양입니다. 첫 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="데이터 마이닝을 공부하면서 드는 생각"/>
+  <meta name="og:description"  content="업무에서 실제로 자주 쓰게 되는 건, “CVR 향상에 가장 크게 기여하는 행동 패턴”을 찾아내는 일인 듯합니다. 어떤 사용자가 어떤 행동을 했는지 여부를 플래그로 만들어 한 테이블에 정리하고, 이 사용자의 CV 여부를 yes/no 로 분류해 둡니다. 예를 들면 이런 모양입니다. 첫 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2013/07/11/data-mining.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="데이터 마이닝을 공부하면서 드는 생각"/>
+  <meta name="twitter:description" content="업무에서 실제로 자주 쓰게 되는 건, “CVR 향상에 가장 크게 기여하는 행동 패턴”을 찾아내는 일인 듯합니다. 어떤 사용자가 어떤 행동을 했는지 여부를 플래그로 만들어 한 테이블에 정리하고, 이 사용자의 CV 여부를 yes/no 로 분류해 둡니다. 예를 들면 이런 모양입니다. 첫 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>데이터 마이닝을 공부하면서 드는 생각</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">데이터 마이닝을 공부하면서 드는 생각</h1>
+    <p class="post-meta"><time datetime="2013-07-11T12:54:00+09:00" itemprop="datePublished">2013-07-11</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>업무에서 실제로 자주 쓰게 되는 건, “CVR 향상에 가장 크게 기여하는 행동 패턴"을 찾아내는 일인 듯합니다. 어떤 사용자가 어떤 행동을 했는지 여부를 플래그로 만들어 한 테이블에 정리하고, 이 사용자의 CV 여부를 yes/no 로 분류해 둡니다. 예를 들면 이런 모양입니다. <img src="/assets/2013/130711-39cb40682eff7d6a478a94e9622297c5-tumblr_inline_mpresatkUV1qz4rgp-15fc0c654d4abcd0e9c1e294ce8c9c33145865b7f09687d0cf1e386e362f92ae.png" alt="이미지"></p>
+<p>첫 번째 방법은 엑셀로 옮겨 처리하는 방식입니다. 이벤트(컬럼)별로 총합을 계산하고, CV 가 yes 로 분류된 비율과 no 로 분류된 비율을 각각 구합니다. 이 둘의 차이가 곧 CVR 에 기여하는 정도가 됩니다.</p>
+<p>두 번째 방법은 R 로 로지스틱 회귀분석을 돌리는 방식입니다. <code>Data.glm</code> 같은 식으로 처리하면 됩니다.</p>
+<p>그런데 막상 해 보면 첫 번째 방법과 두 번째 방법의 결과가 전혀 다르게 나옵니다. 왜 그럴까 따져 보면, 변수가 많을수록 변수들 사이의 조합이 결과에 크게 작용하기 때문입니다. 변수가 많을 때는 association rules 로 시각화해서 보는 편이 좋겠다는 생각이 들었습니다.</p>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

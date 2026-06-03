@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="2017년 Rails, JavaScript에 대한 DHH의 생각" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="DHH의 생각(을 읽은 후 내 생각) Rails를 만든 것으로 유명한 DHH님이 Quora에서 질문을 받는 세션을 가졌습니다. quora 재미있는 질문이 많았습니다. 예를 들어 “2017년에 Rails 프레임워크를 배울 가치가 뭐야?”, “JavaScript 프레임워크가 Rails ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="2017년 Rails, JavaScript에 대한 DHH의 생각"/>
+  <meta name="og:description"  content="DHH의 생각(을 읽은 후 내 생각) Rails를 만든 것으로 유명한 DHH님이 Quora에서 질문을 받는 세션을 가졌습니다. quora 재미있는 질문이 많았습니다. 예를 들어 “2017년에 Rails 프레임워크를 배울 가치가 뭐야?”, “JavaScript 프레임워크가 Rails ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2017/02/21/ruby-dhh-javascript-rails-redux.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2017/170221-1-f052746c2682481166b401cc114c3579db315f87be47ec17c73e58fb61a748f3.jpg"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="2017년 Rails, JavaScript에 대한 DHH의 생각"/>
+  <meta name="twitter:description" content="DHH의 생각(을 읽은 후 내 생각) Rails를 만든 것으로 유명한 DHH님이 Quora에서 질문을 받는 세션을 가졌습니다. quora 재미있는 질문이 많았습니다. 예를 들어 “2017년에 Rails 프레임워크를 배울 가치가 뭐야?”, “JavaScript 프레임워크가 Rails ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2017/170221-1-f052746c2682481166b401cc114c3579db315f87be47ec17c73e58fb61a748f3.jpg">
+
+  <title>2017년 Rails, JavaScript에 대한 DHH의 생각</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">2017년 Rails, JavaScript에 대한 DHH의 생각</h1>
+    <p class="post-meta"><time datetime="2017-02-21T21:51:00+09:00" itemprop="datePublished">2017-02-21</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p><img src="/assets/2017/170221-1-f052746c2682481166b401cc114c3579db315f87be47ec17c73e58fb61a748f3.jpg" alt="이미지"></p>
+<h2 id="dhh의-생각을-읽은-후-내-생각">DHH의 생각(을 읽은 후 내 생각)</h2>
+<p>Rails를 만든 것으로 유명한 DHH님이 Quora에서 질문을 받는 세션을 가졌습니다. <a href="https://www.quora.com/session/David-Heinemeier-Hansson/1" target="_blank" rel="noopener">quora</a> 재미있는 질문이 많았습니다. 예를 들어 “2017년에 Rails 프레임워크를 배울 가치가 뭐야?”, “JavaScript 프레임워크가 Rails를 먹게 될까?”, “왜 Python이 아니라 Ruby로 Rails를 만들었니?” 같은 질문들입니다. 질문만 봐도 읽고 싶어집니다. 게다가 DHH님은 글을 잘 씁니다. 전부 읽고 나니 제 생각과 비슷하다고 느꼈습니다. 오래전부터 제가 DHH님에게 영향을 많이 받았다는 증거일 것입니다.</p>
+<blockquote>
+<p>While we’ve seen a lot a progress in the JavaScript world, we’ve also seen a regression to the complexity-laden world that Rails offered refuge from in the early days.
+Back then the complexity merchant of choice was J2EE, but the complaints are uncannily similar to those leveled against JavaScript today.
+That people spent hours, if not days, just setting up the skeletons.
+The basic build configurations.
+Assembling and cherry-picking from lots of little libraries and frameworks to put together their own snowflake house variety.</p>
+</blockquote>
+<p>13년 전 J2EE와 비교할 정도로 지금의 JavaScript world를 복잡하다고 DHH님은 보고 있습니다. 저 역시 현재 JavaScript world에서 만들어지는 것들을 좋아하지 않습니다. 스프레드시트 정도의 SPA를 만들어야 한다면 redux 같은 것은 어쩔 수 없는 선택지입니다. 하지만 선택하기 전에, 오버엔지니어링이 아닌지 일단 의심해 봐야 합니다. 오버엔지니어링과 이른 최적화는 모든 악의 근원입니다. JavaScript world는 앞으로도 크게 변할 것입니다. 아마 몇 년 뒤에는 지금과 많이 달라질 것이고, 그때는 저도 생각이 달라질 수 있겠습니다. hibernate를 처음 봤을 때의 생각과 지금의 생각이 다른 것처럼 말입니다.</p>
+<blockquote>
+<p>That by formalizing conventions, eliminating valueless choices, and offering a full-stack framework that provides great defaults for anyone who wants to create a complete application, we can make dramatic strides of productivity.
+…
+The vast majority of activity today is for yet another option on the a la carte menu. Yet another build system, yet another view library, yet another ORM. Very little activity in integrated solutions.</p>
+</blockquote>
+<p>Rails는 full-stack framework를 목표로 합니다. conventions를 formalizing 하고, 가치 없는 선택지를 제거하고, 디폴트를 제공하는 식으로 높은 생산성을 만들어 냅니다. 즉, Rails는 integrated solutions 를 지향합니다. 이런 목표를 일관되게 추구하는 프레임워크 중에서는 Rails가 꽤 두드러진 사례라고 봅니다. Rails 외에는 또 다른 option, 또 다른 빌드 시스템, 또 다른 view library, 또 다른 ORM을 내놓는 방향이 많아 보입니다.</p>
+<blockquote>
+<p>You get to use Ruby, which, even in a world that has rediscovered the benefits of functional programming and immutability, remains the most extraordinarily beautiful and luxurious language I’ve yet to encounter.
+Just look at some code.
+I dare you not to fall in love.</p>
+</blockquote>
+<p>Ruby는 함수형 언어의 장점이 재발견된 이 시대에 와서도 DHH님이 본 언어 중 가장 아름다운 언어라고 합니다. 동의합니다. 사실 제가 python과 ruby 사이에서 ruby를 선택했던 이유는 처음엔 단순했습니다. string interpolation이 ruby에서는 되고 python에서는 안 되는 점이 가장 컸습니다. <a href="https://en.wikipedia.org/wiki/String_interpolation#Ruby_.2F_Crystal" target="_blank" rel="noopener">wikipedia</a> 최근 python3.6 부터 python도 가능해졌습니다. <a href="https://www.python.org/dev/peps/pep-0498/" target="_blank" rel="noopener">python</a> 다만 앞에 <code>f</code> 를 붙이는 것을 보니, 역시 python과 ruby는 지향하는 길이 다른 것 같습니다. 그리고 저는 4-spaces 보다 2-spaces가 좋습니다. 사소한 이유지요. python 코드도 가끔 읽을 때가 있는데, 매일 python을 쓰지 않는 저에게 python의 list comprehensions는 좀처럼 익숙해지지 않습니다. 예를 들어 <code>[x**2 for x in range(10)]</code> 같은 것입니다. 그보다는 ruby의 블록이 저에게는 훨씬 쉽고, 생각의 속도로 코딩이 가능하며 읽기에도 자연스럽습니다. 같은 일을 ruby로 적으면 <code>(0..9).map{|x|x**2}</code> 가 됩니다.</p>
+<h2 id="ruby-24">Ruby 2.4</h2>
+<p>지난 크리스마스(2016-12-25)에, ruby2.3 이후 1년 만에 ruby2.4가 나왔습니다. <a href="https://www.ruby-lang.org/en/news/2016/12/25/ruby-2-4-0-released/" target="_blank" rel="noopener">ruby-lang</a> <a href="http://nithinbekal.com/posts/ruby-2-4-features/" target="_blank" rel="noopener">nithinbekal</a></p>
+<p>반올림 함수(<code>Float#round</code>)의 디폴트 동작이 even-half가 되는 무시무시한 이야기가 있었습니다. 실제로 preview3 까지는 <code>2.5.round</code> 의 결과가 <code>2</code> 였습니다. 많은 논란 끝에 결과적으로는 even-half로 동작하는 옵션이 추가되는 것으로 마무리되었습니다. even-half 옵션을 제가 쓸 일이 있을지 잘 모르겠습니다.</p>
+<p>rails의 ActiveSupport에 있던 <code>Hash#transform_values</code> 가 core에 포함되었습니다.</p>
+<p>pry의 <code>binding.pry</code> 와 동일한 기능이 irb에도 <code>binding.irb</code> 로 추가되었다고 합니다. 다만 pry 대신 irb를 쓸 이유는 딱히 없어 보입니다.</p>
+<p>true/false만 리턴하는 <code>Regexp#match?</code> 가 추가되었습니다. <code>Regexp#match</code> 보다 당연히 빠르다고 합니다.</p>
+<p><code>MatchData#named_captures</code> 도 추가되었습니다. 아래처럼 이름 있는 captures를 Hash로 리턴해 주는 메소드라서 아주 편할 것 같습니다.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>/(?&lt;fname&gt;.+) (?&lt;lname&gt;.+)/.match('Ned Stark').named_captures
+#=&gt; {"fname"=&gt;"Ned", "lname"=&gt;"Stark"}</code></pre>
+</div>
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

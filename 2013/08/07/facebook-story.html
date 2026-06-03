@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="Facebook의 새로운 뉴스피드 알고리즘 "Story Bumping"" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="문제는 이런 것이었습니다. 최근까지 뉴스피드는 사용자가 이전에 로그인한 이후의 모든 게시물을 평가해서, 그중 가장 관심이 갈 만한 글을 보여 주고 있었습니다. 하지만 사용자가 늘 페이지를 들여다보고 있는 것은 아닙니다. 몇 시간만 지나면 더 새로운 글이 그 위에 수북이 쌓이고, 결 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Facebook의 새로운 뉴스피드 알고리즘 "Story Bumping""/>
+  <meta name="og:description"  content="문제는 이런 것이었습니다. 최근까지 뉴스피드는 사용자가 이전에 로그인한 이후의 모든 게시물을 평가해서, 그중 가장 관심이 갈 만한 글을 보여 주고 있었습니다. 하지만 사용자가 늘 페이지를 들여다보고 있는 것은 아닙니다. 몇 시간만 지나면 더 새로운 글이 그 위에 수북이 쌓이고, 결 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2013/08/07/facebook-story.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Facebook의 새로운 뉴스피드 알고리즘 "Story Bumping""/>
+  <meta name="twitter:description" content="문제는 이런 것이었습니다. 최근까지 뉴스피드는 사용자가 이전에 로그인한 이후의 모든 게시물을 평가해서, 그중 가장 관심이 갈 만한 글을 보여 주고 있었습니다. 하지만 사용자가 늘 페이지를 들여다보고 있는 것은 아닙니다. 몇 시간만 지나면 더 새로운 글이 그 위에 수북이 쌓이고, 결 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Facebook의 새로운 뉴스피드 알고리즘 "Story Bumping"</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Facebook의 새로운 뉴스피드 알고리즘 "Story Bumping"</h1>
+    <p class="post-meta"><time datetime="2013-08-07T13:08:00+09:00" itemprop="datePublished">2013-08-07</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>문제는 이런 것이었습니다. 최근까지 뉴스피드는 사용자가 이전에 로그인한 이후의 모든 게시물을 평가해서, 그중 가장 관심이 갈 만한 글을 보여 주고 있었습니다. 하지만 사용자가 늘 페이지를 들여다보고 있는 것은 아닙니다. 몇 시간만 지나면 더 새로운 글이 그 위에 수북이 쌓이고, 결국 읽지 않은 글은 영영 만날 기회를 잃어버립니다.</p>
+<p>해결책으로 등장한 것이 Story Bumping 알고리즘입니다. 페이스북은 사용자가 마지막으로 확인한 시점 이후에 올라온 글만 평가하는 대신, 아직 읽지 않은 최근 글도 평가 대상에 함께 넣었습니다. 그 덕분에 조금 시간이 지난 글이라도, 더 관심이 갈 만한 글을 만날 수 있게 되었습니다.</p>
+<p>평가 결과를 보면 효과가 분명합니다. 페이스북은 이미 웹 버전에서 Story Bumping을 운영하고 있습니다. 테스트에서 좋아요와 공유 수가 5% 늘었고, 기업이나 개인 페이지에 대한 반응도 8% 늘었습니다. “사용자가 관심을 가질 가능성이 있는 글"이 노출되는 비율은 57%에서 70%로 크게 올랐습니다.</p>
+<blockquote>
+<p>700 million people use the Facebook News Feed every day but many don’t understand how it decides what appears, so Facebook announced today it will start on how the feed algorithm is changing similar to how Google does. So Facebook will soon start to show these rapid real-time updates in chronological order so you see the most recent update first and the oldest one last. Facebook’s first post will be about “Story Bumping”, which pushes stories you haven’t seen above ones you have.</p>
+</blockquote>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

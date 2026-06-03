@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="Uber의 Message Queue, Akka, Vim, Java" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="Uber가 만든 MQ 디자인. (task-queue 용도) Uber가 며칠 전(12/6)에 “Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog”라는 제목으로 글을 올렸습니 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Uber의 Message Queue, Akka, Vim, Java"/>
+  <meta name="og:description"  content="Uber가 만든 MQ 디자인. (task-queue 용도) Uber가 며칠 전(12/6)에 “Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog”라는 제목으로 글을 올렸습니 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2016/12/14/uber-message-queue-akka-vim-java.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Uber의 Message Queue, Akka, Vim, Java"/>
+  <meta name="twitter:description" content="Uber가 만든 MQ 디자인. (task-queue 용도) Uber가 며칠 전(12/6)에 “Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog”라는 제목으로 글을 올렸습니 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Uber의 Message Queue, Akka, Vim, Java</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Uber의 Message Queue, Akka, Vim, Java</h1>
+    <p class="post-meta"><time datetime="2016-12-14T21:59:00+09:00" itemprop="datePublished">2016-12-14</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="uber가-만든-mq-디자인-task-queue-용도">Uber가 만든 MQ 디자인. (task-queue 용도)</h3>
+<p>Uber가 며칠 전(12/6)에 “Cherami: Uber Engineering’s Durable and Scalable Task Queue in Go - Uber Engineering Blog"라는 제목으로 글을 올렸습니다. <a href="https://eng.uber.com/cherami/" target="_blank" rel="noopener">https://eng.uber.com/cherami/</a></p>
+<p>Uber는 microservice-architecture(이하 MSA)로 운영하는 것으로 유명합니다. 이 글로 MSA에 필수인 큐를 Uber가 어떤 디자인으로 만들었는지 알 수 있고, 그 디자인이 실제로 어떻게 구현되며 어떤 고민을 안고 있는지도 엿볼 수 있습니다. 남이 만든 디자인을 관찰하는 일은 재미있습니다. 저는 주로 가용성과 확장성을 봅니다. 저에게 처리량은 확장성에 포함되고, fault-tolerance는 가용성에 포함됩니다. 엄격히 말하면 다른 개념이지만, 저는 그렇게 묶어 둡니다. Uber는 하루에 1억 개의 메시지가 오간다고 하니, 단순히 계산하면 초당 평균 1,157개 정도의 메시지로 추정할 수 있습니다. Uber에서 이 메시지가 사용되는 사례로 밝힌 것은 post-trip processing, fraud detection, user notification, incentive campaigns 같은 것들입니다.</p>
+<p>주요 디자인 선택을 보면, 가용성을 위한 선택으로 competing consumers, replicating messages, eventual consistency가 있습니다. eventual consistency를 택한 것은 아마도 순서를 보장하지 않는다는 뜻일 것입니다. 확장성을 위한 선택으로는 competing consumers가 있고, write 처리량을 관찰하다가 확장하는 역할까지 미들웨어에서 하는 것으로 보입니다.</p>
+<p>저는 새로운 솔루션을 도입하는 일에는 보수적입니다. 새로운 솔루션을 선택하는 일에는 많은 단점이 따르기 때문입니다(논증은 생략합니다). 저는 보통 둘 중 한 가지 길을 선호합니다. 하나는 새로운 솔루션의 “디자인"만 이해하고, 기존 기술로 요구사항에 맞춰 직접 구현하는 길입니다. 다른 하나는 그 솔루션을 아주 깊이 이해했고 동시에 전파하기도 쉬운 솔루션일 때에 한해 도입하는 길입니다. 보통은 디자인을 제대로 이해하지 못한 채 유행을 좇아 도입하는 경우가 많습니다.</p>
+<p>그중에서도 큐 시스템은 장단점이 다양한 솔루션이 많습니다. 회사마다, 팀마다 저마다의 큐를 만드는 경향도 있습니다. 고가용성과 고확장성을 갖추고 보장 옵션을 선택할 수 있는 큐가 있다면 좋겠다고 생각합니다. 지금까지는 Amazon SQS가 그것에 가장 가까웠습니다.</p>
+<h3 id="akka">Akka</h3>
+<p>최근에 Akka와 Actor model의 디자인도 잠깐 검토할 일이 있었습니다. Akka는 해 주는 일이 거의 없는 틀이었습니다. 저는 이런 프레임워크를 좋아합니다.</p>
+<p>보통은 X를 보장하면 Y가 떨어집니다. 풍선을 누르면 다른 부분이 부풀어 오르는 것과 같습니다. 세상의 일은 대부분 tradeoff입니다. 어떤 프레임워크가 X를 보장한다고 주장해도, 사실은 그 보장의 경계를 증명하기 위해 많은 비용을 써야 합니다. Akka는 오버헤드가 없는 틀만 두고 대부분의 일은 개발자에게 위임합니다. 그리고 actor model이 구조적으로 살을 붙이기 좋아 보였습니다.</p>
+<h3 id="vim">vim</h3>
+<p>vim 관련 링크를 모아 둡니다.</p>
+<p>2016 NYC Vim talk에서 “vim 플러그인이 하는 일의 90%를 플러그인 없이 하는 방법"이라는 제목의 발표가 있었습니다. 영상은 <a href="https://www.youtube.com/watch?v=XA2WjJbmmoM" target="_blank" rel="noopener">youtube</a>, 슬라이드는 <a href="https://github.com/mcantor/no_plugins/blob/master/no_plugins.vim" target="_blank" rel="noopener">github</a>에 있습니다. 재미있게 보긴 했지만 남은 것은 별로 없었습니다. 다른 내용은 좀 억지스럽고 부자연스럽게 문제를 해결하려는 것처럼 보였습니다. 플러그인으로 하면 쉬운데 왜 이렇게까지 하나 싶은 기분이 들기도 했습니다. 파일 브라우저는 저도 NERDTree보다 netrw 계열을 쓰는 데 동의합니다. 다만 NERDTree도 여전히 같이 쓰고 있습니다. 내장된 순수 netrw는 문제가 좀 있습니다.</p>
+<p>vim 스크립트 치트시트도 봤습니다. <a href="http://ricostacruz.com/cheatsheets/vimscript.html" target="_blank" rel="noopener">ricostacruz</a> 스니펫으로 저장해 두고 쓰기 좋습니다.</p>
+<p>파이콘2016에서 vim과 gnome-desktop을 사용하시는 분이 있었습니다. <a href="https://www.youtube.com/watch?v=xDz8WVO_wjE" target="_blank" rel="noopener">youtube</a> Ruby의 byebug 같은 역할을 Python에서는 pudb로 하는 듯합니다. gdb와 매핑되는 네이밍으로 보입니다. 그런데 저렇게 UI까지 제공하는 것이 좋은 선택일까 하는 생각이 들었습니다. nautilus를 터미널에서 직접 입력하시는 모습을 보고 오래된 gnome-desktop 사용자분이시구나 하는 생각이 들었습니다. vim에서 Python 자동완성을 위해 <a href="https://github.com/davidhalter/jedi-vim" target="_blank" rel="noopener">jedi-vim</a>을 사용하신다고 합니다.</p>
+<p>redis를 만든 antirez님이 vim을 어떻게 쓰는지 쓴 글도 읽었습니다. <a href="http://howivim.com/2016/salvatore-sanfilippo/" target="_blank" rel="noopener">howivim</a> antirez님이 쓰는 전체 vimrc는 이것인 듯합니다. <a href="https://gist.github.com/antirez/3860461" target="_blank" rel="noopener">github</a> 특별한 것은 없고 vim을 최소한의 설정으로 가볍게 쓰시는 스타일입니다. 실수 방지를 위해 <code>map 4 $</code>를 설정해 두신 점이 귀엽습니다. 저도 따라 설정해 봤는데, 너무 불편해서 며칠 만에 그만뒀습니다. <code>r!date</code>는 저도 설정해서 쓰는데, 같은 사람을 또 만났다는 사실이 반가웠습니다.</p>
+<h3 id="java">java</h3>
+<p>Java 생태계는 unix 철학을 따르지 않고, 제가 쓰기에는 불편한 점이 많습니다. 저랑은 정말 안 맞는 것 같습니다.</p>
+<p>예를 들어 현재 프로젝트의 dependency 목록을 보여주는 shell 함수를 만들고 싶었습니다. 당연히 <code>mvn help:effective-pom | xml2json | jq '...생략...'</code> 정도로 간단히 되겠지 싶었지만, <code>mvn help:effective-pom</code> 결과는 XML 외에도 info log 정보를 verbose하게 stdout에 같이 뿌립니다. XML만 출력하려면 파일로 쓰고 그 파일을 다시 읽어 작업해야 합니다. 불편합니다. verbose 옵션이 디폴트라니. quiet 옵션도 없습니다.</p>
+<p>원격 의존성을 shell에서 검색하고 싶기도 했습니다. Ruby라면 <code>gem search kafka</code>, Python이라면 <code>pip search kafka</code>, Docker라면 <code>docker search kafka</code>, apt라면 <code>apt search kafka</code>를 할 텐데, Java에서는 도대체 왜 <code>mvn search kafka</code> 같은 명령이 없는지 모르겠습니다. 다행히 <code>mvn-search kafka</code> 식으로 만들 수 있도록 누군가 savant <a href="https://github.com/spilth/savant" target="_blank" rel="noopener">github</a>라는 도구를 만들어 두었습니다(덧붙이자면, Ruby의 kafka 라이브러리가 옛날 버전만 지원하는 것을 보고 좀 우울해졌습니다).</p>
+<p>모든 의존성의 문자열 검색을 ag 같은 외부 툴로 하고 싶기도 했습니다. Ruby라면 <code>ag ~/.rvm/gems/ruby-2.3.1/gems/</code>로 검색하면 됩니다. 실제로 저는 이런 검색을 하는 vim 커맨드를 만들어 키 하나로 찾아갑니다. Java에서도 같은 일을 해 볼까 해서 시도해 봤는데, 일단 Maven Repository에 소스를 올리지 않는 라이브러리가 많습니다. 그리고 모두 jar로 압축된 형태로 <code>~/.m2/repository</code> 아래에 저장됩니다. ag로 검색하려면 jar를 풀고 class를 디컴파일해서 저장해야 합니다. 악. 안 합니다, 안 해.</p>
+<p>Java에도 타입 추론이 제안되었습니다. <a href="http://openjdk.java.net/jeps/286" target="_blank" rel="noopener">java</a> Java 커뮤니티는 세계 최고로 보수적인 프로그래머 집단이라서, Scala나 Kotlin의 기능들을 아주 천천히 흡수하고 있습니다. NeoVim의 핵심 기능을 Vim8이 따라잡는 흐름이나, CoffeeScript 같은 언어가 결국 본진에 흡수되며 입지가 줄어드는 흐름과 비슷해 보입니다. Kotlin 같은 언어도 (너무!) 좋지만 결국 비슷한 길을 걷지 않을까 짐작해 봅니다.</p>
+<p>타입 추론의 문법은 다음 중 하나로 결정될 것 같습니다. <code>var x = expr</code> only (like C#), <code>var, plus val for immutable locals</code> (like Scala, Kotlin), <code>var, plus let for immutable locals</code> (like Swift), <code>auto x = expr</code> (like C++), <code>const x = expr</code> (already a reserved word), <code>final x = expr</code> (already a reserved word), <code>let x = expr</code>, <code>def x = expr</code> (like Groovy), <code>x := expr</code> (like Go).</p>
+<p>저는 Go 스타일의 <code>x := expr</code>로 결정되면 좋겠는데, 자바스럽지 않다며 기각되었다고 합니다. “The Go syntax (a different kind of assignment operator) seems pretty un-Javaish.” 자바스럽지 않다니, 하.</p>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

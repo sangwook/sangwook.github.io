@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="Trello의 boards 로딩시간을 단축하기위해 1주일동안 한 작업들" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="문제는 이렇습니다. 1000건의 카드를 읽으려면 렌더링이 끝나기까지 7초가 넘게 걸렸습니다. 목표는 1400x1000 윈도우에 906개의 카드가 있는 보드의 로딩 시간을, 하루에 10%씩 단축해 보는 것이었습니다. 그 한 주의 기록입니다. 월요일에는 7.2초에서 6.7초로, 약 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Trello의 boards 로딩시간을 단축하기위해 1주일동안 한 작업들"/>
+  <meta name="og:description"  content="문제는 이렇습니다. 1000건의 카드를 읽으려면 렌더링이 끝나기까지 7초가 넘게 걸렸습니다. 목표는 1400x1000 윈도우에 906개의 카드가 있는 보드의 로딩 시간을, 하루에 10%씩 단축해 보는 것이었습니다. 그 한 주의 기록입니다. 월요일에는 7.2초에서 6.7초로, 약 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/01/23/trello-backbonejs-defferring-speed-paint-fog-creek.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Trello의 boards 로딩시간을 단축하기위해 1주일동안 한 작업들"/>
+  <meta name="twitter:description" content="문제는 이렇습니다. 1000건의 카드를 읽으려면 렌더링이 끝나기까지 7초가 넘게 걸렸습니다. 목표는 1400x1000 윈도우에 906개의 카드가 있는 보드의 로딩 시간을, 하루에 10%씩 단축해 보는 것이었습니다. 그 한 주의 기록입니다. 월요일에는 7.2초에서 6.7초로, 약 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Trello의 boards 로딩시간을 단축하기위해 1주일동안 한 작업들</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Trello의 boards 로딩시간을 단축하기위해 1주일동안 한 작업들</h1>
+    <p class="post-meta"><time datetime="2014-01-23T13:10:00+09:00" itemprop="datePublished">2014-01-23</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <p>문제는 이렇습니다. 1000건의 카드를 읽으려면 렌더링이 끝나기까지 7초가 넘게 걸렸습니다. 목표는 1400x1000 윈도우에 906개의 카드가 있는 보드의 로딩 시간을, 하루에 10%씩 단축해 보는 것이었습니다. 그 한 주의 기록입니다.</p>
+<p>월요일에는 7.2초에서 6.7초로, 약 7% 줄였습니다. border, shadow, gradient 같은 무거운 CSS 스타일은 브라우저를 매우 느리게 만듭니다. 그래서 이런 것들을 제거하는 데 집중했습니다. 특히 스크롤 성능에서 효과가 컸습니다. 플랫 디자인을 위해서 작업한 것은 아니고 어디까지나 속도를 위해 손을 댄 것인데, 결과적으로 더 깔끔하고 단순해지기까지 했습니다.</p>
+<p>화요일에는 6.7초에서 5.9초로, 약 12% 줄였습니다. 저희는 Backbone.js를 쓰고 있었습니다. Backbone.js는 view를 사용하기 아주 쉽게 만들어 줍니다. 그러다 보니 모든 카드의 멤버 각각에 view를 만들어 두고 있었습니다. 멤버를 클릭하면 프로필과 메뉴를 볼 수 있게 하기 위해서였습니다. 그런데 view가 불필요하게 많이 생성되어 브라우저가 시간을 쓰고 있었습니다. 그래서 click handler를 만들고, 필요할 때만 view를 생성하도록 바꿨습니다. 추가로 CSS도 더 줄였습니다.</p>
+<p>수요일에는 5.9초에서 5.9초, 변화가 없었습니다. jQuery 대신 브라우저 네이티브 innerHTML과 getElementByClassName 메소드를 쓰려고 시도했습니다. 네이티브 API를 쓰면 성능이 개선될 것이라 기대했지만, 효과를 보지 못했습니다. 쓸데없이 시간을 보낸 하루였습니다.</p>
+<p>목요일에는 5.9초에서 960ms로 줄었습니다. 정말 획기적인 성과가 있었던 날입니다. 두 가지를 했습니다. “preventing layout thrashing"과 “progressive rendering"입니다.</p>
+<p>Preventing layout thrashing은 layout thrashing 문제를 잡는 일입니다. 브라우저는 HTML을 렌더링할 때 크게 두 가지 일을 합니다. 하나는 layout으로, element의 크기와 위치를 계산해 결정하는 일입니다. 다른 하나는 paint로, 올바른 위치에 정확한 color로 픽셀을 그리는 일입니다. borders, backgrounds 등의 CSS를 줄여 paint는 줄였지만, 여전히 layout에는 이슈가 남아 있었습니다.</p>
+<p>기존의 카드 렌더링 순서는 이랬습니다. 먼저 하얀색 카드 프레임과 빈 카드명이 DOM에 삽입됩니다. 그다음 label과 멤버 뱃지 등이 차례로 추가됩니다. 이렇게 한 이유는 실시간 업데이트 때문입니다. 무언가 바뀌면 카드의 해당 부분만 자동으로 다시 렌더링되도록 하고 싶었습니다. 예를 들어 멤버가 추가되면 cardView.renderMembers 메소드가 트리거되어 해당 멤버만 렌더링되는 식입니다. 카드 전체를 다시 그려서 화면이 깜박이는 것을 피하기 위해서였습니다.</p>
+<p>문제는 HTML을 미리 만들고 DOM을 삽입하면 layout이 한 번 실행되고, HTML을 좀 더 만들고 DOM을 또 삽입하면 layout이 또 실행된다는 점입니다. 카드 하나에 여러 번 DOM을 삽입하기 때문에, 결과적으로 layout이 대량으로 실행됩니다. 해결책은 렌더링을 카드를 DOM에 삽입하기 전 단계로 옮기는 것이었습니다.</p>
+<p>원래 카드 view를 렌더링하는 함수는 아래와 같았습니다.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>render: -&gt;
+  data = model.toJSON()
+
+  @$.innerHTML = templates.fill(
+    'card_in_list',
+    data
+  ) # add stuff to the DOM, layout
+
+  @renderMembers() # add more stuff to the DOM, layout
+  @renderLabels() # add even more stuff to the DOM, layout
+
+  @
+</code></pre>
+</div>
+<p>이것을 아래처럼 바꿨습니다.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>render: -&gt;
+  data = model.toJSON()
+  data.memberData = []
+
+  for member in members
+    memberData.push member.toJSON()
+
+  data.labelData = []
+  for labels in labels when label.isActive
+    labelData.push label
+
+  partials = 
+    "member": templates.member
+    "label": templates.label
+
+  @$.innerHTML = templates.fill(
+    'card_in_list',
+    data,
+    partials
+  ) # only add stuff to the DOM once, only one layout
+
+  @
+</code></pre>
+</div>
+<p>layout 문제는 아직 조금 더 남아 있었습니다. 과거에는 리스트의 width가 스크린 크기에 따라 조정되고 있어서, 사이드바를 만지거나, 목록을 추가하거나, 창 크기를 바꿀 때마다 layout이 발생했습니다. 그래서 list의 폭을 고정해서 layout이 일어나지 않도록 했습니다. 그 대신 폭을 마음대로 조정할 수 없게 되었지만, 이것은 성능을 위한 trade-off로 받아들였습니다.</p>
+<p>다음은 Progressive rendering입니다. 그래도 브라우저는 여전히 5초가 걸렸습니다. Chrome의 Timeline을 보면 대부분의 시간을 script에서 쓰고 있었습니다. Trello 개발자 Brett Kiefer님은 예전에 jQuery UI droppables의 초기화를 비동기 라이브러리의 큐 메소드로 감싸서 board를 paint한 이후로 deferring(연기)하는 방식으로 UI 잠김 문제를 해결한 적이 있습니다. click 후에 긴 작업, 그다음 paint였던 흐름을 click 후에 paint, 그다음 긴 작업으로 바꾼 것입니다.</p>
+<p>비슷한 기법을 카드 렌더링에 응용할 수 없을지 생각해 봤습니다. 큰 DOM을 한 번에 생성해서 삽입하는 데 시간을 쓰는 대신, 작은 DOM을 생성하고 삽입하고, 다음 DOM을 만들고 삽입하는 방식을 반복하는 것입니다. 이렇게 하면 브라우저의 UI 스레드를 free up할 수 있고, 빠르게 paint할 수 있으며, 잠김 현상도 피할 수 있습니다(prevent locking up). 이 작업 하나로 한 번에 960ms까지 단축할 수 있었습니다. 이 과정을 요약하면 아래 그림과 같습니다.</p>
+<p><img src="/assets/2014/140123-af2c1a5fe019da330ece64cdb12154c8-tumblr_inline_mzu62a1eIg1r7z9vf-703fa3d25ab85349470c26d99c9de6f03a463a4f64d58b39814a646cc67ddb78.png" alt="이미지"></p>
+<p>코드는 다음과 같습니다. 리스트 안의 카드들은 Backbone.js의 collection 안에 있고, collection은 자신의 view를 가지고 있습니다.</p>
+<p>큐 기법을 활용한 card collection view의 render 메소드는 대략 아래 코드와 같습니다.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>render: -&gt;
+
+   renderQueue = new async.queue (models, next) =&gt;
+     @appendSubviews(@subview(CardView, model) for model in models)
+     # _.defer, a.k.a. setTimeout(fn, 0), will yield the UI thread 
+     # so the browser can paint.
+     _.defer next
+   , 1
+
+   chunkSize = 30
+   models = @getModels()
+   modelChunks = []
+   while models.length &gt; 0
+     modelChunks.push(models.splice(0, chunkSize))
+
+   for models in modelChunks
+     # async.queue flattens arrays so lets wrap this array 
+     # so it's an array on the other end...
+     renderQueue.push [models]
+
+   @
+</code></pre>
+</div>
+<p>추가로 <code>translateZ: 0</code>이라는 hack도 적용했습니다. covers, stickers, member avatars 등 이미지 데이터가 많은 부분이 있는데, 이 속성을 적용하면 브라우저가 paint에 GPU를 사용하기 때문에, GPU가 처리하는 동안 다른 일을 동시에 할 수 있게 됩니다.</p>
+<p>금요일에는 이번 주에 발생한 버그들을 수정하는 데 시간을 썼습니다.</p>
+<p><a href="http://blog.fogcreek.com/we-spent-a-week-making-trello-boards-load-extremely-fast-heres-how-we-did-it/" target="_blank" rel="noopener">http://blog.fogcreek.com/we-spent-a-week-making-trello-boards-load-extremely-fast-heres-how-we-did-it/</a></p>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>

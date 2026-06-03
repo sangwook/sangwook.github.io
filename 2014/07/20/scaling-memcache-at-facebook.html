@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title"       content="Facebook이 분산 key-value 스토어를 확장한 과정" />
+  <meta name="author"      content="이상욱"/>
+  <meta name="description" content="0개의 memcache 서버 소수의 DB만으로도 부하를 감당하기에 충분한 단계입니다. 데이터는 이미 여러 DB로 샤드되어 있는 상태입니다. 이 단계의 문제는 high fanout과 multiple rounds of data fetching입니다. 조금의 memcache 서버 읽기 ..."/>
+
+  <meta name="og:site_name"    content="이상욱"/>
+  <meta name="og:type"         content="article"/>
+  <meta name="og:title"        content="Facebook이 분산 key-value 스토어를 확장한 과정"/>
+  <meta name="og:description"  content="0개의 memcache 서버 소수의 DB만으로도 부하를 감당하기에 충분한 단계입니다. 데이터는 이미 여러 DB로 샤드되어 있는 상태입니다. 이 단계의 문제는 high fanout과 multiple rounds of data fetching입니다. 조금의 memcache 서버 읽기 ..."/>
+  <meta name="og:url"          content="https://sangwook.github.io/2014/07/20/scaling-memcache-at-facebook.html"/>
+  <meta name="og:image"        content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg"/>
+  <meta name="og:image:width"  content="960"/>
+  <meta name="og:image:height" content="436"/>
+
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:site"        content="@yiisw">
+  <meta name="twitter:creator"     content="@yiisw">
+  <meta name="twitter:title"       content="Facebook이 분산 key-value 스토어를 확장한 과정"/>
+  <meta name="twitter:description" content="0개의 memcache 서버 소수의 DB만으로도 부하를 감당하기에 충분한 단계입니다. 데이터는 이미 여러 DB로 샤드되어 있는 상태입니다. 이 단계의 문제는 high fanout과 multiple rounds of data fetching입니다. 조금의 memcache 서버 읽기 ..."/>
+  <meta name="twitter:image"       content="https://sangwook.github.io/assets/2016/161011-ubuntu16-screenfetch-d309a0fce49f7abaf5a95f61a72481466e2187b8b361c52f334b03de5a55c92d.jpg">
+
+  <title>Facebook이 분산 key-value 스토어를 확장한 과정</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/main-caae314880d485d51225e30ff81b77cd77bf8582dcd712eda64afdc9c886713c.css">
+  <link rel="alternate" type="application/rss+xml" title="이상욱" href="http://feeds.feedburner.com/sangwook">
+  <link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/123514?s=100">
+</head>
+
+  <body>
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <div class="about-desc">
+      <a href="/" title="sangwook">이상욱</a>,
+      scott,
+      <a href="https://github.com/sangwook">github</a>,
+      <a href="https://blog.naver.com/yiisw">네이버</a>,
+      <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+    </div>
+
+  </div>
+
+</header>
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Facebook이 분산 key-value 스토어를 확장한 과정</h1>
+    <p class="post-meta"><time datetime="2014-07-20T17:17:00+09:00" itemprop="datePublished">2014-07-20</time>
+     <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="name" itemprop="name">이상욱</span></span></p>
+  </header>
+  <div class="post-content" itemprop="articleBody">
+    <h3 id="0개의-memcache-서버">0개의 memcache 서버</h3>
+<p>소수의 DB만으로도 부하를 감당하기에 충분한 단계입니다. 데이터는 이미 여러 DB로 샤드되어 있는 상태입니다. 이 단계의 문제는 high fanout과 multiple rounds of data fetching입니다.</p>
+<h3 id="조금의-memcache-서버">조금의 memcache 서버</h3>
+<p>읽기 성능을 더 개선해야 하는 단계입니다. 서버 10대로 초당 100만 오퍼레이션을 처리합니다. 이 단계에서는 look-aside caching 문제가 발생합니다. 여러 웹서버가 병렬로 memcache set을 할 때 충돌이 일어나는 것입니다. 이를 해결하기 위해 memcache 프로토콜 확장인 lease를 사용합니다. cache miss가 발생하면 lease-id를 발급하고, 이 id를 가진 곳만 set을 할 수 있도록 합니다.</p>
+<h3 id="1개의-cluster-안에-많은-memcache-서버">1개의 cluster 안에 많은 memcache 서버</h3>
+<p>읽기 성능을 더더욱 개선해야 하는 단계입니다. 서버 100대로 초당 1천만 오퍼레이션을 처리합니다. 아이템은 여러 memcache 서버에 consistent hashing으로 분산됩니다. 이 단계의 문제는 모든 웹서버와 모든 memcache 서버가 다대다 통신을 한다는 점입니다. 사용자 요청 하나에 대해 100여 개의 memcache 서버에서 데이터를 가져오게 되고, 그 과정에서 네트워크 스위치의 버퍼가 넘쳐 패킷이 손실됩니다. 해결책은 슬라이딩 윈도우로 동시 요청을 제한하는 것이었습니다.</p>
+<h3 id="여러-개의-cluster-안의-많은-memcache-서버">여러 개의 cluster 안의 많은 memcache 서버</h3>
+<p>서버 1000대로 초당 1억 오퍼레이션을 처리하는 단계입니다. 캐시의 consistency를 유지해야 하고, 데이터의 over-replication도 관리해야 합니다. 캐시된 데이터는 DB가 업데이트되면 함께 제거되어야 합니다. 해결책은 mysql commit log를 tail하면서 캐시를 제거하는 프로그램(McSqueal)을 만들어 각 DB서버에서 돌게 한 것입니다.</p>
+<h3 id="지리적으로-분산된-여러-개의-cluster">지리적으로 분산된 여러 개의 cluster</h3>
+<p>서버 1000대로 초당 10억 오퍼레이션을 처리하는 단계입니다. Replica를 다른 지역에 구성합니다. 여기서 문제가 발생합니다. 웹서버에서 마스터 DB로 데이터를 쓰고, 마스터 DB에서 Replica DB로 replication이 완료되기 전에, 다른 웹서버에서 cache miss가 일어나면 Replica DB에서 잘못된 값으로 cache set이 되어 버리는 것입니다. 해결책은 Remote Markers입니다. 마스터 DB에 쓰기 전에 remote marker를 set하고, remote marker가 set되어 있는 동안에는 replica DB가 아닌 master DB에서 데이터를 읽도록 합니다.</p>
+<h3 id="링크">링크</h3>
+<ul>
+<li><a href="https://www.usenix.org/sites/default/files/conference/protected-files/nishtala_nsdi13_slides.pdf" target="_blank" rel="noopener">슬라이드</a></li>
+<li><a href="https://www.usenix.org/conference/nsdi13/technical-sessions/presentation/nishtala" target="_blank" rel="noopener">발표 영상</a></li>
+</ul>
+
+  </div>
+</article>
+      </div>
+    </main>
+    <footer class="site-footer">
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        이상욱,
+        scott,
+        <a href="https://github.com/sangwook">github</a>,
+        <a href="https://blog.naver.com/yiisw">네이버</a>,
+        <a class="page-link" href="http://feeds.feedburner.com/sangwook">RSS</a>
+      </div>
+
+      <!-- <div class="footer-col footer-col-2"> -->
+      <!--   <ul class="social-media-list"> -->
+      <!--     <li> -->
+      <!--     </li> -->
+      <!--   </ul> -->
+      <!-- </div> -->
+
+      <!-- <div class="footer-col footer-col-3"> -->
+      <!-- </div> -->
+    </div>
+
+  </div>
+</footer>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-26630011-3', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  </body>
+</html>
